@@ -1,0 +1,225 @@
+<div class="pricing-page-wrapper">
+    <app-navbar></app-navbar>
+
+    <main>
+        <!-- Pricing Hero Section -->
+        <section class="section pricing-hero">
+            <div class="container hero-center-content">
+                <h1>Simple and Transparent Pricing</h1>
+                <p class="lead">Choose the plan that fits your laboratory needs. Start small and scale as your lab grows.</p>
+                
+                <!-- Billing Toggle -->
+                <div class="billing-toggle-container">
+                    <span [class.active]="!isYearly">Monthly</span>
+                    <button class="billing-switch" (click)="toggleBilling()" [class.yearly]="isYearly">
+                        <span class="switch-handle"></span>
+                    </button>
+                    <span [class.active]="isYearly">Yearly <span class="discount-tag">Save 20%</span></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Plans -->
+        <section class="section">
+            <div class="container pricing-grid">
+                <!-- Starter Plan -->
+                <div class="card pricing-card">
+                    <div class="plan-header">
+                        <h3>Starter Plan</h3>
+                        <p class="text-muted">Best for small labs.</p>
+                    </div>
+                    <div class="plan-price">
+                        <span class="currency">$</span>
+                        <span class="amount">{{ isYearly ? '15' : '19' }}</span>
+                        <span class="period">/mo</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Single laboratory branch</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Patient management</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Test catalogue</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Report generation</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Basic billing</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Email support</li>
+                    </ul>
+                    <button class="btn btn-secondary w-full">Start Free Trial</button>
+                </div>
+
+                <!-- Professional Plan -->
+                <div class="card pricing-card popular">
+                    <div class="popular-tag">Most Popular</div>
+                    <div class="plan-header">
+                        <h3>Professional Plan</h3>
+                        <p class="text-muted">Best for growing laboratories.</p>
+                    </div>
+                    <div class="plan-price">
+                        <span class="currency">$</span>
+                        <span class="amount">{{ isYearly ? '39' : '49' }}</span>
+                        <span class="period">/mo</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Multiple branches (up to 3)</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Patient management</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Test catalogue</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Advanced report generation</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Billing and invoicing</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Staff management</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Patient portal access</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Priority support</li>
+                    </ul>
+                    <button class="btn btn-primary w-full">Start Free Trial</button>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="card pricing-card">
+                    <div class="plan-header">
+                        <h3>Enterprise Plan</h3>
+                        <p class="text-muted">Best for large lab chains.</p>
+                    </div>
+                    <div class="plan-price">
+                        <span class="amount">Custom</span>
+                    </div>
+                    <ul class="plan-features">
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Unlimited branches</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Advanced analytics</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Full billing system</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Custom integrations</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Dedicated support</li>
+                        <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Advanced security</li>
+                    </ul>
+                    <button class="btn btn-secondary w-full">Contact Sales</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comparison Table -->
+        <section class="section comparison-section">
+            <div class="container">
+                <h2 class="section-title">Compare Plans</h2>
+                <div class="card comparison-card">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Starter</th>
+                                <th>Professional</th>
+                                <th>Enterprise</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Patient Management</td>
+                                <td><svg class="check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></td>
+                                <td><svg class="check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></td>
+                                <td><svg class="check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></td>
+                            </tr>
+                            <tr>
+                                <td>Test Catalogue</td>
+                                <td><svg class="check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></td>
+                                <td><svg class="check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></td>
+                                <td><svg class="check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></td>
+                            </tr>
+                            <tr>
+                                <td>Report Generation</td>
+                                <td>Basic</td>
+                                <td>Advanced</td>
+                                <td>Customized</td>
+                            </tr>
+                            <tr>
+                                <td>Multi-Branch Support</td>
+                                <td>—</td>
+                                <td>Up to 3</td>
+                                <td>Unlimited</td>
+                            </tr>
+                            <tr>
+                                <td>Billing & Invoices</td>
+                                <td>Basic</td>
+                                <td>Full</td>
+                                <td>Enterprise</td>
+                            </tr>
+                            <tr>
+                                <td>Patient Portal</td>
+                                <td>—</td>
+                                <td><svg class="check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></td>
+                                <td><svg class="check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></td>
+                            </tr>
+                            <tr>
+                                <td>Staff Management</td>
+                                <td>—</td>
+                                <td><svg class="check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></td>
+                                <td><svg class="check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></td>
+                            </tr>
+                            <tr>
+                                <td>Priority Support</td>
+                                <td>—</td>
+                                <td><svg class="check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></td>
+                                <td><svg class="check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Choose Us -->
+        <section class="section" style="background: var(--bg-main);">
+            <div class="container">
+                <h2 class="section-title">Why Laboratories Choose Our Platform</h2>
+                <div class="grid-4">
+                    @for (benefit of benefits; track benefit.title) {
+                        <div class="card benefit-card">
+                            <div class="benefit-icon-box">
+                                @if (benefit.icon === 'shield') {
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                } @else if (benefit.icon === 'zap') {
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                } @else if (benefit.icon === 'activity') {
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                                } @else if (benefit.icon === 'grid') {
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                                }
+                            </div>
+                            <h4>{{ benefit.title }}</h4>
+                            <p class="text-muted">{{ benefit.description }}</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="section">
+            <div class="container" style="max-width: 800px;">
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <div class="faq-list">
+                    @for (faq of faqs; track faq.question; let i = $index) {
+                        <div class="faq-item card" [class.active]="faq.open" (click)="toggleFaq(i)">
+                            <div class="faq-question">
+                                <h4>{{ faq.question }}</h4>
+                                <span class="faq-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" [style.transform]="faq.open ? 'rotate(180deg)' : 'rotate(0deg)'" style="transition: transform 0.3s ease;"><polyline points="6 9 12 15 18 9"/></svg>
+                                </span>
+                            </div>
+                            <div class="faq-answer" [class.show]="faq.open">
+                                <p class="text-muted">{{ faq.answer }}</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA -->
+        <section class="section final-cta">
+            <div class="container hero-center-content">
+                <h2>Start Managing Your Laboratory Smarter</h2>
+                <p class="lead" style="color: white; opacity: 0.9;">Join modern laboratories that use our platform to streamline operations.</p>
+                <div class="cta-btns">
+                    <a href="#" class="btn btn-secondary" style="background: white; color: var(--primary); border: none;">Start Free Trial</a>
+                    <a href="#" class="btn btn-primary" style="background: rgba(255,255,255,0.1); border: 1px solid white;">View Pricing</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <app-footer></app-footer>
+</div>
