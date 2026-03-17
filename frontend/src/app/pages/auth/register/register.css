@@ -1,0 +1,356 @@
+.register-page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+    background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-main) 100%);
+}
+
+.register-hero {
+    padding: 60px 0 40px;
+    text-align: center;
+}
+
+.hero-center-content h1 {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.form-section {
+    padding-bottom: 100px;
+}
+
+.register-form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Card Header Stylings */
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.step-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.card-header h3 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+/* Form Controls */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.field-full {
+    grid-column: span 2;
+}
+
+label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.required {
+    color: var(--danger);
+}
+
+.form-control {
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-button);
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-control.error {
+    border-color: var(--danger);
+}
+
+select.form-control {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+/* Helper & Error Texts */
+.helper-text {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.error-text {
+    font-size: 0.8rem;
+    color: var(--danger);
+    font-weight: 500;
+}
+
+/* Password Requirements */
+.password-requirements {
+    background-color: var(--bg-main);
+    padding: 12px;
+    border-radius: var(--radius-button);
+    margin-top: 8px;
+}
+
+.password-requirements p {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.password-requirements ul {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.password-requirements li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+}
+
+.password-requirements li::before {
+    content: "○";
+    color: var(--text-secondary);
+}
+
+.password-requirements li.met {
+    color: var(--success);
+}
+
+.password-requirements li.met::before {
+    content: "✓";
+    font-weight: bold;
+}
+
+/* Terms Card */
+.terms-card {
+    padding: 24px;
+}
+
+.checkbox-group {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.link {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+/* Submit Actions */
+.btn-lg {
+    padding: 16px 32px;
+    font-size: 1.1rem;
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Spacing Utils */
+.mt-10 {
+    margin-top: 10px;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+.mt-30 {
+    margin-top: 30px;
+}
+
+.mt-40 {
+    margin-top: 40px;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.auth-footer-text {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* Custom Material Select Styles */
+.custom-mat-field {
+    width: 100%;
+}
+
+/* Match mat-select height and design with .form-control */
+::ng-deep .custom-mat-field .mat-mdc-text-field-wrapper {
+    background-color: var(--bg-main) !important;
+    border-radius: var(--radius-button) !important;
+    padding: 0 !important;
+}
+
+::ng-deep .custom-mat-field .mat-mdc-form-field-flex {
+    height: 48px !important;
+    align-items: center !important;
+    padding: 0 16px !important;
+}
+
+::ng-deep .custom-mat-field .mdc-notched-outline {
+    display: none !important;
+    /* Hide default outline to use our own border pattern */
+}
+
+::ng-deep .custom-mat-field .mat-mdc-form-field-infix {
+    padding: 0 !important;
+    border-top: none !important;
+    width: auto !important;
+    min-width: 0 !important;
+}
+
+::ng-deep .custom-mat-field .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+}
+
+/* Custom border matching .form-control */
+.custom-mat-field {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-button);
+    transition: var(--transition);
+    background-color: var(--bg-main);
+}
+
+.custom-mat-field:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+::ng-deep .custom-mat-field .mat-mdc-select-trigger {
+    height: 48px !important;
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+::ng-deep .custom-mat-field .mat-mdc-select-value {
+    color: var(--text-primary) !important;
+    font-family: inherit !important;
+    font-size: 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    height: 48px !important;
+}
+
+::ng-deep .custom-mat-field .mat-mdc-select-arrow-wrapper {
+    height: 48px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+::ng-deep .custom-mat-field .mat-mdc-select-arrow {
+    color: var(--text-secondary) !important;
+    margin-top: 0 !important;
+}
+
+/* Stylish Option Panel styling */
+::ng-deep .mat-mdc-select-panel {
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-card) !important;
+    box-shadow: var(--shadow-lg) !important;
+    margin-top: 8px !important;
+    padding: 8px !important;
+    min-width: calc(100% + 32px) !important;
+}
+
+::ng-deep .mat-mdc-option {
+    min-height: 44px !important;
+    border-radius: var(--radius-button) !important;
+    margin-bottom: 4px !important;
+    padding: 0 12px !important;
+    transition: var(--transition) !important;
+}
+
+::ng-deep .mat-mdc-option:hover:not(.mdc-list-item--disabled) {
+    background-color: var(--bg-main) !important;
+}
+
+::ng-deep .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+    background-color: rgba(37, 99, 235, 0.08) !important;
+}
+
+::ng-deep .mat-mdc-option.mdc-list-item--selected .mdc-list-item__primary-text {
+    color: var(--primary) !important;
+    font-weight: 600 !important;
+}
+
+::ng-deep .mat-mdc-option .mdc-list-item__primary-text {
+    color: var(--text-primary) !important;
+    font-size: 0.95rem !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .register-hero h1 {
+        font-size: 2.2rem;
+    }
+
+    .field-full {
+        grid-column: span 1;
+    }
+
+    .card {
+        padding: 20px;
+    }
+}

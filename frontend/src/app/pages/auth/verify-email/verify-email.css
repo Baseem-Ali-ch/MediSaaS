@@ -1,0 +1,125 @@
+.auth-page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+    background: linear-gradient(180deg, var(--bg-card) 0%, var(--bg-main) 100%);
+}
+
+.auth-hero {
+    padding: 60px 0 40px;
+    text-align: center;
+}
+
+.hero-center-content h1 {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.form-section {
+    padding-bottom: 100px;
+}
+
+.auth-card-container {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.verify-card {
+    padding: 40px 30px;
+}
+
+.verify-icon-wrapper {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.verify-icon {
+    z-index: 2;
+}
+
+.pulse-animation {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(37, 99, 235, 0.1);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    70% { transform: scale(1.4); opacity: 0; }
+    100% { transform: scale(0.95); opacity: 0; }
+}
+
+.verify-card h3 {
+    font-size: 1.6rem;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.verify-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.auth-links {
+    font-size: 0.9rem;
+}
+
+/* Buttons */
+.btn-lg {
+    padding: 14px 28px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    border-radius: var(--radius-button);
+}
+
+.btn-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background-color: var(--border);
+    border-color: var(--border);
+    color: var(--text-secondary);
+}
+
+/* Utils */
+.text-center { text-align: center; }
+.mt-10 { margin-top: 10px; }
+.mt-20 { margin-top: 20px; }
+.mt-30 { margin-top: 30px; }
+.w-full { width: 100%; }
+
+.link {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-center-content h1 {
+        font-size: 2.2rem;
+    }
+    
+    .auth-card-container {
+        padding: 0 20px;
+    }
+}

@@ -1,0 +1,66 @@
+<div class="auth-page-wrapper">
+    <app-navbar></app-navbar>
+
+    <main class="main-content">
+        <section class="section auth-hero">
+            <div class="container hero-center-content">
+                @if(isLoading){
+                <h1>Verifying...</h1>
+                <p class="lead">Please wait while we verify your email address.</p>
+                } @else {
+                <h1>Verify Your Email</h1>
+                <p class="lead">Please verify your email address to complete your registration.</p>
+                }
+            </div>
+        </section>
+
+        <section class="section form-section">
+            <div class="container">
+                <div class="auth-card-container">
+                    <div class="card verify-card text-center">
+                        <div class="verify-icon-wrapper">
+                            <div class="pulse-animation"></div>
+                            <svg class="verify-icon" xmlns="http://www.w3.org/2000/svg" width="64" height="64"
+                                viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
+                                </path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                        </div>
+
+                        @if(isLoading){
+                        <h3>We are verifying your email address.</h3>
+                        <p class="mt-10">Please wait while we verify your email address. This may take a few seconds.
+                        </p>
+                        } @else {
+                        <h3>Confirm your email</h3>
+                        <p class="mt-10">We've sent a verification link to <strong>{{ email }}</strong>. Click the link
+                            in the email to confirm your account.</p>
+                        <div class="form-actions mt-30">
+                            <button (click)="onResend()" class="btn btn-primary btn-lg w-full" [disabled]="!canResend">
+                                @if (canResend) {
+                                Resend Verification Email
+                                } @else {
+                                Resend in {{ countdown }}s
+                                }
+                            </button>
+                        </div>
+
+                        <div class="auth-links mt-20">
+                            <a routerLink="/auth/register-lab" class="link">Entered wrong email? Register again</a>
+                        </div>
+                        }
+                    </div>
+
+                    <div class="auth-footer mt-30 text-center">
+                        <p>Already verified? <a routerLink="/auth/login" class="link">Sign In</a></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <app-footer></app-footer>
+</div>
+<app-loader type="page" [isLoading]="isLoading" [diameter]="20"></app-loader>
