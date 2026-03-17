@@ -1,0 +1,204 @@
+<div class="register-page-wrapper">
+    <app-navbar></app-navbar>
+
+    <main class="main-content">
+        <section class="section register-hero">
+            <div class="container hero-center-content">
+                <h1>Join MediSaaS</h1>
+                <p class="lead">Register your laboratory and start streamlining your operations today.</p>
+            </div>
+        </section>
+
+        <section class="section form-section">
+            <div class="container">
+                <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+
+                    <!-- SECTION 1: Lab Details -->
+                    <div class="card form-card">
+                        <div class="card-header">
+                            <span class="step-badge">01</span>
+                            <h3>Lab Details</h3>
+                        </div>
+                        <div class="grid-2 mt-20">
+                            <div class="form-group">
+                                <label for="labName">Lab Name <span class="required">*</span></label>
+                                <input type="text" id="labName" formControlName="labName"
+                                    placeholder="ABC Diagnostic Center" class="form-control"
+                                    [class.error]="registerForm.get('labName')?.touched && registerForm.get('labName')?.invalid">
+                                @if (registerForm.get('labName')?.touched && registerForm.get('labName')?.invalid) {
+                                <span class="error-text">Lab name is required</span>
+                                }
+                            </div>
+                            <div class="form-group">
+                                <label for="registrationNumber">Registration Number</label>
+                                <input type="text" id="registrationNumber" formControlName="registrationNumber"
+                                    placeholder="Government license or registration number" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="labEmail">Lab Email <span class="required">*</span></label>
+                                <input type="email" id="labEmail" formControlName="labEmail"
+                                    placeholder="lab@example.com" class="form-control"
+                                    [class.error]="registerForm.get('labEmail')?.touched && registerForm.get('labEmail')?.invalid">
+                                @if (registerForm.get('labEmail')?.touched && registerForm.get('labEmail')?.invalid) {
+                                <span class="error-text">Valid lab email is required</span>
+                                }
+                            </div>
+                            <div class="form-group">
+                                <label for="labPhone">Lab Phone <span class="required">*</span></label>
+                                <input type="tel" id="labPhone" formControlName="labPhone" placeholder="+91 9876543210"
+                                    class="form-control"
+                                    [class.error]="registerForm.get('labPhone')?.touched && registerForm.get('labPhone')?.invalid">
+                                @if (registerForm.get('labPhone')?.touched && registerForm.get('labPhone')?.invalid) {
+                                <span class="error-text">Lab phone is required</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: Address Information -->
+                    <div class="card form-card mt-30">
+                        <div class="card-header">
+                            <span class="step-badge">02</span>
+                            <h3>Address Information</h3>
+                        </div>
+                        <div class="grid-2 mt-20">
+                            <div class="form-group field-full">
+                                <label for="address1">Address Line 1 <span class="required">*</span></label>
+                                <input type="text" id="address1" formControlName="address1"
+                                    placeholder="Street layout, Plot No." class="form-control"
+                                    [class.error]="registerForm.get('address1')?.touched && registerForm.get('address1')?.invalid">
+                            </div>
+                            <div class="form-group field-full">
+                                <label for="address2">Address Line 2 (Optional)</label>
+                                <input type="text" id="address2" formControlName="address2"
+                                    placeholder="Apartment, suite, etc." class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="city">City <span class="required">*</span></label>
+                                <input type="text" id="city" formControlName="city" placeholder="City"
+                                    class="form-control"
+                                    [class.error]="registerForm.get('city')?.touched && registerForm.get('city')?.invalid">
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State <span class="required">*</span></label>
+                                <input type="text" id="state" formControlName="state" placeholder="State"
+                                    class="form-control"
+                                    [class.error]="registerForm.get('state')?.touched && registerForm.get('state')?.invalid">
+                            </div>
+                            <div class="form-group">
+                                <label for="country">Country <span class="required">*</span></label>
+                                <input type="text" id="country" formControlName="country" placeholder="Country"
+                                    class="form-control"
+                                    [class.error]="registerForm.get('country')?.touched && registerForm.get('country')?.invalid">
+                            </div>
+                            <div class="form-group">
+                                <label for="postalCode">Postal Code <span class="required">*</span></label>
+                                <input type="text" id="postalCode" formControlName="postalCode"
+                                    placeholder="PIN/Postal Code" class="form-control"
+                                    [class.error]="registerForm.get('postalCode')?.touched && registerForm.get('postalCode')?.invalid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: Owner Details -->
+                    <div class="card form-card mt-30">
+                        <div class="card-header">
+                            <span class="step-badge">03</span>
+                            <h3>Owner Details</h3>
+                        </div>
+                        <div class="grid-2 mt-20">
+                            <div class="form-group">
+                                <label for="ownerName">Owner Full Name <span class="required">*</span></label>
+                                <input type="text" id="ownerName" formControlName="ownerName" placeholder="Full Name"
+                                    class="form-control"
+                                    [class.error]="registerForm.get('ownerName')?.touched && registerForm.get('ownerName')?.invalid">
+                            </div>
+                            <div class="form-group">
+                                <label for="ownerEmail">Owner Email <span class="required">*</span></label>
+                                <input type="email" id="ownerEmail" formControlName="ownerEmail"
+                                    placeholder="owner@example.com" class="form-control"
+                                    [class.error]="registerForm.get('ownerEmail')?.touched && registerForm.get('ownerEmail')?.invalid">
+                                <p class="helper-text">This email will be used to login.</p>
+                            </div>
+                            <div class="form-group field-full">
+                                <label for="ownerPhone">Phone Number <span class="required">*</span></label>
+                                <input type="tel" id="ownerPhone" formControlName="ownerPhone"
+                                    placeholder="+91 9876543210" class="form-control"
+                                    [class.error]="registerForm.get('ownerPhone')?.touched && registerForm.get('ownerPhone')?.invalid">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 4: Account Security -->
+                    <div class="card form-card mt-30">
+                        <div class="card-header">
+                            <span class="step-badge">04</span>
+                            <h3>Account Security</h3>
+                        </div>
+                        <div class="grid-2 mt-20">
+                            <div class="form-group">
+                                <label for="password">Password <span class="required">*</span></label>
+                                <input type="password" id="password" formControlName="password" placeholder="••••••••"
+                                    class="form-control"
+                                    [class.error]="registerForm.get('password')?.touched && registerForm.get('password')?.invalid">
+                                <div class="password-requirements">
+                                    <p>Password must contain:</p>
+                                    <ul>
+                                        <li [class.met]="registerForm.get('password')?.value?.length >= 8">Minimum 8
+                                            characters</li>
+                                        <li [class.met]="/[0-9]/.test(registerForm.get('password')?.value || '')">At
+                                            least one number</li>
+                                        <li
+                                            [class.met]="/[!@#$%^&*(),.?&quot;:{}|<>]/.test(registerForm.get('password')?.value || '')">
+                                            At least one special character</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm Password <span class="required">*</span></label>
+                                <input type="password" id="confirmPassword" formControlName="confirmPassword"
+                                    placeholder="••••••••" class="form-control"
+                                    [class.error]="(registerForm.get('confirmPassword')?.touched && registerForm.get('confirmPassword')?.invalid) || registerForm.hasError('passwordMismatch')">
+                                @if (registerForm.hasError('passwordMismatch') &&
+                                registerForm.get('confirmPassword')?.touched) {
+                                <span class="error-text">Passwords do not match</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 6: Terms and Agreement -->
+                    <div class="card form-card terms-card mt-30">
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="agreeTerms" formControlName="agreeTerms">
+                            <label for="agreeTerms">I agree to the <a href="#" class="link">Terms of Service</a> and <a
+                                    href="#" class="link">Privacy Policy</a> <span class="required">*</span></label>
+                        </div>
+                        @if (registerForm.get('agreeTerms')?.touched && registerForm.get('agreeTerms')?.invalid) {
+                        <span class="error-text mt-10">You must agree to the terms</span>
+                        }
+                    </div>
+
+                    <!-- SUBMIT BUTTON -->
+                    <div class="form-actions mt-40 text-center">
+                        <button type="submit"
+                            class="btn btn-primary btn-lg w-full flex justify-center items-center gap-2"
+                            [disabled]="registerForm.invalid || isLoading">
+                            <app-loader type="button" [isLoading]="isLoading" [diameter]="20"></app-loader>
+                            @if (isLoading) {
+                            <span>Creating Account...</span>
+                            } @else {
+                            <span>Create Lab Account</span>
+                            }
+                        </button>
+                        <p class="auth-footer-text mt-20">
+                            Already have an account? <a routerLink="/auth/login" class="link">Sign In</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <app-footer></app-footer>
+</div>

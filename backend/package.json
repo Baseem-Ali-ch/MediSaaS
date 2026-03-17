@@ -9,21 +9,35 @@
   "scripts": {
     "dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
-    "start": "node dist/app.js"
+    "start": "node dist/app.js",
+    "prisma:generate": "prisma generate --schema=prisma/schema",
+    "prisma:migrate": "prisma migrate dev --schema=prisma/schema",
+    "prisma:studio": "prisma studio --schema=prisma/schema"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/mssql": "^9.1.9",
     "@types/node": "^25.3.5",
+    "@types/nodemailer": "^7.0.11",
+    "prisma": "^7.5.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@prisma/adapter-mssql": "^7.5.0",
+    "@prisma/client": "^7.5.0",
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.2",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "nodemon": "^3.1.14"
+    "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^8.0.2",
+    "nodemon": "^3.1.14",
+    "winston": "^3.19.0",
+    "winston-daily-rotate-file": "^5.0.0"
   }
 }
