@@ -1,0 +1,98 @@
+<!-- Sidebar -->
+<aside class="admin-sidebar" [class.collapsed]="isCollapsed()">
+  <!-- Logo Section -->
+  <div class="sidebar-logo">
+    <mat-icon style="font-size: 28px; width: 28px; height: 28px; color: var(--primary);">medical_services</mat-icon>
+    @if (!isCollapsed()) {
+      <span class="logo-text">MediSaaS</span>
+    }
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      @for (item of navItems; track item.label) {
+      <li class="nav-item-wrapper" [class.has-children]="item.children">
+        
+        <!-- Standard Link -->
+        @if (!item.children) {
+        <a [routerLink]="item.route" 
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact: false}"
+          class="nav-item"
+          [matTooltip]="getTooltipContent(item)"
+          matTooltipPosition="right"
+          [matTooltipDisabled]="!isCollapsed()"
+        >
+          <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+          @if (!isCollapsed()) {
+            <span class="nav-text">{{ item.label }}</span>
+          }
+        </a>
+        }
+
+        <!-- Parent Menu item (Accordion) -->
+        @if (item.children) {
+        <div class="nav-item menu-parent" 
+             [class.expanded]="item.expanded"
+             (click)="toggleExpand(item)"
+        >
+          <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+          @if (!isCollapsed()) {
+            <span class="nav-text">{{ item.label }}</span>
+            <mat-icon class="expand-icon">
+                {{ item.expanded ? 'expand_less' : 'expand_more' }}
+            </mat-icon>
+          }
+        </div>
+
+        <!-- Hover panel for children when collapsed -->
+        @if (isCollapsed()) {
+          <div class="hover-floating-menu">
+            <div class="hover-title">{{ item.label }}</div>
+            <ul class="hover-child-list">
+              @for (child of item.children; track child.label) {
+                <li>
+                  <a [routerLink]="child.route" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}" class="hover-child-link">
+                    {{ child.label }}
+                  </a>
+                </li>
+              }
+            </ul>
+          </div>
+        }
+
+        <!-- Child Menu -->
+        <div class="child-menu-wrapper" [class.expanded]="item.expanded && !isCollapsed()">
+          <ul class="child-menu">
+            @for (child of item.children; track child.label) {
+            <li>
+              <a [routerLink]="child.route" 
+                 routerLinkActive="active" 
+                 class="child-nav-item">
+                 <span class="child-dot"></span>
+                 {{ child.label }}
+              </a>
+            </li>
+            }
+          </ul>
+        </div>
+        }
+      </li>
+      }
+    </ul>
+  </nav>
+
+  <!-- Sidebar Footer: Theme Toggle & Expand/Collapse -->
+  <div class="sidebar-footer">
+    <!-- Theme Toggle Left -->
+    <button class="footer-btn" (click)="toggleTheme()" [matTooltip]="isDarkMode ? 'Light Mode' : 'Dark Mode'" matTooltipPosition="right">
+      <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+
+    <!-- Expand/Collapse Right -->
+    <button class="footer-btn" (click)="toggleSidebar()" [matTooltip]="isCollapsed() ? 'Menu' : 'Collapse'" matTooltipPosition="right">
+      <mat-icon>{{ isCollapsed() ? 'keyboard_double_arrow_right' : 'keyboard_double_arrow_left' }}</mat-icon>
+    </button>
+  </div>
+</aside>

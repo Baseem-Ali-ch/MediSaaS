@@ -1,0 +1,226 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-title">
+      <h1>Lab Management</h1>
+      <p class="text-muted">Manage your laboratory information</p>
+    </div>
+  </div>
+
+  <div class="content-panel fade-slide-in">
+    <div class="panel-header flex-between">
+      <h2>Laboratory Details</h2>
+      @if (!isEditMode) {
+        <button class="btn btn-secondary" (click)="enableEditMode()">
+          <mat-icon>edit</mat-icon> Edit Settings
+        </button>
+      } @else {
+        <div class="edit-actions">
+           <button class="btn btn-secondary" (click)="discardChanges()">
+             <mat-icon>close</mat-icon> Discard
+           </button>
+           <button class="btn btn-primary" [disabled]="!hasChanges() || !labFormValid() || isSaving" (click)="saveChanges()">
+             @if (isSaving) {
+               <mat-icon class="spinner">autorenew</mat-icon> Saving...
+             } @else {
+               <mat-icon>check</mat-icon> Save Changes
+             }
+           </button>
+        </div>
+      }
+    </div>
+
+    <!-- Read & Edit Forms overlay -->
+    <form class="clean-form flex-col gap-32">
+      
+      <!-- Section 1 -->
+      <div class="form-section">
+        <h3 class="section-title"><mat-icon>business</mat-icon> Basic Information</h3>
+        <div class="grid-2">
+          
+          <div class="form-group full-width">
+            @if (!isEditMode) {
+              <div class="read-only-field">
+                <label>Lab Name</label>
+                <div class="field-value">{{ labData.name }}</div>
+              </div>
+            } @else {
+              <div class="floating-input-wrapper" [class.focused]="focus['name']" [class.edited]="labData.name !== originalData.name">
+                <mat-icon class="input-icon">corporate_fare</mat-icon>
+                <input type="text" id="name" name="name" [(ngModel)]="labData.name" required (focus)="setFocus('name')" (blur)="clearFocus('name')" placeholder=" " />
+                <label for="name">Lab Name *</label>
+              </div>
+              @if (!labData.name) {
+                <div class="inline-validation error">Lab Name is required</div>
+              }
+            }
+          </div>
+
+          <div class="form-group">
+            @if (!isEditMode) {
+              <div class="read-only-field">
+                <label>Email Address</label>
+                <div class="field-value">{{ labData.email }}</div>
+              </div>
+            } @else {
+              <div class="floating-input-wrapper" [class.focused]="focus['email']" [class.edited]="labData.email !== originalData.email" [class.error]="!isValidEmail(labData.email) && labData.email !== ''">
+                <mat-icon class="input-icon">mail</mat-icon>
+                <input type="email" id="email" name="email" [(ngModel)]="labData.email" required (focus)="setFocus('email')" (blur)="clearFocus('email')" placeholder=" " />
+                <label for="email">Email *</label>
+              </div>
+              @if (!isValidEmail(labData.email) && labData.email !== '') {
+                <div class="inline-validation error">Invalid email format</div>
+              }
+            }
+          </div>
+
+          <div class="form-group">
+            @if (!isEditMode) {
+              <div class="read-only-field">
+                <label>Phone Number</label>
+                <div class="field-value">{{ labData.phone }}</div>
+              </div>
+            } @else {
+              <div class="floating-input-wrapper" [class.focused]="focus['phone']" [class.edited]="labData.phone !== originalData.phone">
+                <mat-icon class="input-icon">phone</mat-icon>
+                <input type="tel" id="phone" name="phone" [(ngModel)]="labData.phone" required (focus)="setFocus('phone')" (blur)="clearFocus('phone')" placeholder=" " />
+                <label for="phone">Phone *</label>
+              </div>
+            }
+          </div>
+
+          <div class="form-group full-width">
+            <div class="read-only-field permanent-read">
+               <label>Registration No <mat-icon class="lock-icon">lock</mat-icon></label>
+               <div class="field-value">{{ labData.registrationNo }} <span class="badge" style="margin-left: 6px;">Official</span></div>
+               @if (isEditMode) {
+                 <p class="helper-text text-muted">Registration No cannot be changed after initial setup.</p>
+               }
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- Section 2 -->
+      <div class="form-section">
+        <h3 class="section-title"><mat-icon>location_on</mat-icon> Address Details</h3>
+        <div class="grid-2">
+          
+          <div class="form-group full-width">
+            @if (!isEditMode) {
+              <div class="read-only-field">
+                <label>Address Line 1</label>
+                <div class="field-value">{{ labData.address1 }}</div>
+              </div>
+            } @else {
+              <div class="floating-input-wrapper" [class.focused]="focus['address1']" [class.edited]="labData.address1 !== originalData.address1">
+                <mat-icon class="input-icon">pin_drop</mat-icon>
+                <input type="text" id="address1" name="address1" [(ngModel)]="labData.address1" required (focus)="setFocus('address1')" (blur)="clearFocus('address1')" placeholder=" " />
+                <label for="address1">Address Line 1 *</label>
+              </div>
+            }
+          </div>
+
+          <div class="form-group full-width">
+            @if (!isEditMode) {
+              @if (labData.address2) {
+                <div class="read-only-field">
+                  <label>Address Line 2</label>
+                  <div class="field-value">{{ labData.address2 }}</div>
+                </div>
+              }
+            } @else {
+              <div class="floating-input-wrapper" [class.focused]="focus['address2']" [class.edited]="labData.address2 !== originalData.address2">
+                <mat-icon class="input-icon">map</mat-icon>
+                <input type="text" id="address2" name="address2" [(ngModel)]="labData.address2" (focus)="setFocus('address2')" (blur)="clearFocus('address2')" placeholder=" " />
+                <label for="address2">Address Line 2 (Optional)</label>
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            @if (!isEditMode) {
+              <div class="read-only-field">
+                <label>City</label>
+                <div class="field-value">{{ labData.city }}</div>
+              </div>
+            } @else {
+              <div class="floating-input-wrapper" [class.focused]="focus['city']" [class.edited]="labData.city !== originalData.city">
+                <mat-icon class="input-icon">location_city</mat-icon>
+                <input type="text" id="city" name="city" [(ngModel)]="labData.city" required (focus)="setFocus('city')" (blur)="clearFocus('city')" placeholder=" " />
+                <label for="city">City *</label>
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+             @if (!isEditMode) {
+               <div class="read-only-field">
+                 <label>State</label>
+                 <div class="field-value">{{ labData.state }}</div>
+               </div>
+             } @else {
+               <div class="floating-input-wrapper" [class.focused]="focus['state']" [class.edited]="labData.state !== originalData.state">
+                 <mat-icon class="input-icon">explore</mat-icon>
+                 <input type="text" id="state" name="state" [(ngModel)]="labData.state" required (focus)="setFocus('state')" (blur)="clearFocus('state')" placeholder=" " />
+                 <label for="state">State *</label>
+               </div>
+             }
+          </div>
+
+          <div class="form-group">
+             @if (!isEditMode) {
+               <div class="read-only-field">
+                 <label>Country</label>
+                 <div class="field-value"><mat-icon class="inline-icon">public</mat-icon> {{ labData.country }}</div>
+               </div>
+             } @else {
+               <div class="floating-input-wrapper" [class.focused]="focus['country']" [class.edited]="labData.country !== originalData.country">
+                 <mat-icon class="input-icon">public</mat-icon>
+                 <input list="countries" id="country" name="country" [(ngModel)]="labData.country" required (focus)="setFocus('country')" (blur)="clearFocus('country')" placeholder=" " autocomplete="off" />
+                 <label for="country">Country *</label>
+                 <datalist id="countries">
+                    <option value="United States">
+                    <option value="Canada">
+                    <option value="United Kingdom">
+                    <option value="Australia">
+                    <option value="India">
+                    <option value="Germany">
+                 </datalist>
+                 <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
+               </div>
+             }
+          </div>
+
+          <div class="form-group">
+             @if (!isEditMode) {
+               <div class="read-only-field">
+                 <label>Postal Code</label>
+                 <div class="field-value">{{ labData.postalCode }}</div>
+               </div>
+             } @else {
+               <div class="floating-input-wrapper" [class.focused]="focus['postalCode']" [class.edited]="labData.postalCode !== originalData.postalCode" [class.error]="!isValidPostal(labData.postalCode) && labData.postalCode !== ''">
+                 <mat-icon class="input-icon">markunread_mailbox</mat-icon>
+                 <input type="text" id="postalCode" name="postalCode" [(ngModel)]="labData.postalCode" (keypress)="numericOnly($event)" maxlength="10" required (focus)="setFocus('postalCode')" (blur)="clearFocus('postalCode')" placeholder=" " />
+                 <label for="postalCode">Postal Code *</label>
+               </div>
+               @if (!isValidPostal(labData.postalCode) && labData.postalCode !== '') {
+                 <div class="inline-validation error">Max 10 digits allowed.</div>
+               }
+             }
+          </div>
+
+        </div>
+      </div>
+      
+    </form>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast-notification" [class.show]="toastMessage !== ''" [class.error]="toastIsError">
+  <mat-icon class="toast-icon">{{ toastIsError ? 'error_outline' : 'task_alt' }}</mat-icon>
+  <span>{{ toastMessage }}</span>
+</div>

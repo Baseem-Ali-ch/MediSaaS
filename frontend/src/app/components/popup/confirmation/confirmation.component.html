@@ -1,0 +1,21 @@
+<h2 mat-dialog-title class="dialog-header">
+  <div class="header-icon" [class.destructive]="isDestructive">
+    <mat-icon>{{ isDestructive ? 'warning' : 'help_outline' }}</mat-icon>
+  </div>
+  {{ title }}
+</h2>
+
+<mat-dialog-content class="dialog-body">
+  <p [innerHTML]="message"></p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-footer">
+  <button type="button" class="btn btn-secondary" (click)="onCancel()" cdkFocusInitial>
+    @if (cancelIcon) { <mat-icon class="btn-inner-icon">{{ cancelIcon }}</mat-icon> }
+    {{ cancelText }}
+  </button>
+  <button type="button" class="btn btn-primary" [class.btn-danger]="isDestructive" (click)="onConfirm()">
+    @if (confirmIcon) { <mat-icon class="btn-inner-icon">{{ confirmIcon }}</mat-icon> }
+    {{ confirmText }}
+  </button>
+</mat-dialog-actions>

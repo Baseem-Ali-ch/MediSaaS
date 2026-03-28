@@ -184,9 +184,8 @@
                         <button type="submit"
                             class="btn btn-primary btn-lg w-full flex justify-center items-center gap-2"
                             [disabled]="registerForm.invalid || isLoading">
-                            <app-loader type="button" [isLoading]="isLoading" [diameter]="20"></app-loader>
                             @if (isLoading) {
-                            <span>Creating Account...</span>
+                            <mat-icon class="spinner">autorenew</mat-icon> Creating Account...
                             } @else {
                             <span>Create Lab Account</span>
                             }

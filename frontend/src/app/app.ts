@@ -1,11 +1,14 @@
 import { Component, signal, OnInit } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { ToastComponent } from './components/toast/toast';
+import { LoaderComponent } from './components/loader/loader';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, ToastComponent, LoaderComponent],
+
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

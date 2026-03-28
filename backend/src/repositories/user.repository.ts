@@ -1,5 +1,6 @@
 import { PrismaClient, User, Prisma } from "@prisma/client";
 import { BaseRepository } from "./base.repository";
+import bcrypt from 'bcrypt'
 
 export class UserRepository extends BaseRepository<
   User,
@@ -22,4 +23,13 @@ export class UserRepository extends BaseRepository<
       },
     });
   }
+
+  async comparePassword(userId: number, password: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return false;
+    }
+    return await bcrypt.compare(password, user.password);
+  }
+
 }

@@ -25,14 +25,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       // token expired — call refresh
       return tokenService.refreshAccessToken().pipe(
         switchMap((res) => {
-          tokenService.setTokens(res.accessToken, res.refreshToken);
+          tokenService.setTokens(res.token.accessToken, res.token.refreshToken);
 
           // retry original request with new token
           return next(
             req.clone({
               setHeaders: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${res.accessToken}`,
+                Authorization: `Bearer ${res.token.accessToken}`,
               },
             })
           );

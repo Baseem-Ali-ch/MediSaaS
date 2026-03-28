@@ -4,16 +4,18 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface TokenResponse {
-  accessToken: string;
-  refreshToken: string;
+  token: {
+    accessToken: string;
+    refreshToken: string;
+  }
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class TokenService {
-  private readonly ACCESS_KEY = 'access_token';
-  private readonly REFRESH_KEY = 'refresh_token';
+  private readonly ACCESS_KEY = 'access-token';
+  private readonly REFRESH_KEY = 'refresh-token';
 
   constructor(private http: HttpClient) { }
 
@@ -32,7 +34,7 @@ export class TokenService {
   }
 
   refreshAccessToken(): Observable<TokenResponse> {
-    return this.http.post<TokenResponse>(`${environment.apiUrl}/auth/refresh`, {
+    return this.http.post<TokenResponse>(`${environment.apiUrl}/auth/refresh-token`, {
       refreshToken: localStorage.getItem(this.REFRESH_KEY),
     });
   }

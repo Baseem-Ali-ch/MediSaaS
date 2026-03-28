@@ -5,3 +5,5 @@ dist
 
 notes.md
 api-test-medisaas
+logs
+package-lock.json

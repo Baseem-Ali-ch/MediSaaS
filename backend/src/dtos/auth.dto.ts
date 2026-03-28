@@ -44,6 +44,16 @@ export class RegisterLabDTO {
   }
 }
 
+export class LoginDTO {
+  email: string;
+  password: string;
+
+  constructor(data: Partial<LoginDTO>) {
+    this.email = data.email?.trim().toLowerCase() || "";
+    this.password = data.password || "";
+  }
+}
+
 export class VerifyEmailDTO {
   token: string;
 
@@ -56,5 +66,31 @@ export class RefreshTokenDTO {
   refreshToken: string;
   constructor(data: Partial<RefreshTokenDTO>) {
     this.refreshToken = data.refreshToken || "";
+  }
+}
+
+export class ResendEmailVerificationDTO {
+  email: string;
+
+  constructor(data: Partial<ResendEmailVerificationDTO>) {
+    this.email = data.email?.trim().toLowerCase() || "";
+  }
+}
+
+export class ForgotPasswordDTO {
+  email: string;
+
+  constructor(data: Partial<ForgotPasswordDTO>) {
+    this.email = data.email?.trim().toLowerCase() || "";
+  }
+}
+
+export class ResetPasswordDTO {
+  newPassword: string;
+  token: string;
+
+  constructor(body: any, query: any) {
+    this.newPassword = body.newPassword || "";
+    this.token = (query.token as string) || "";
   }
 }

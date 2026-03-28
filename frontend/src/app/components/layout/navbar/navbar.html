@@ -1,50 +1,76 @@
-<header class="navbar">
+@if (!isAdmin) {
+<header class="navbar public-navbar">
     <div class="container">
-        <a routerLink="/" class="logo">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2v20" />
-                <path d="M2 12h20" />
-                <path d="M4.5 9a3.5 3.5 0 0 1 7 0 3.5 3.5 0 0 1 7 0" />
-                <path d="M4.5 15a3.5 3.5 0 0 0 7 0 3.5 3.5 0 0 0 7 0" />
-            </svg>
+        <a routerLink="/" class="logo" style="gap: 8px;">
+            <mat-icon
+                style="font-size: 28px; width: 28px; height: 28px; color: var(--primary);">medical_services</mat-icon>
             MediSaaS
         </a>
         <nav class="nav-links">
             <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
-                class="nav-link">Home</a>
-            <a routerLink="/about" routerLinkActive="active" class="nav-link">About</a>
-            <a routerLink="/pricing" routerLinkActive="active" class="nav-link">Pricing</a>
-            <a routerLink="/contact" routerLinkActive="active" class="nav-link">Contact</a>
+                class="nav-link"><mat-icon>home</mat-icon> Home</a>
+            <a routerLink="/about" routerLinkActive="active" class="nav-link"><mat-icon>info</mat-icon> About</a>
+            <a routerLink="/pricing" routerLinkActive="active" class="nav-link"><mat-icon>sell</mat-icon> Pricing</a>
+            <a routerLink="/contact" routerLinkActive="active" class="nav-link"><mat-icon>contact_support</mat-icon>
+                Contact</a>
         </nav>
         <div class="nav-actions">
-            <!-- Theme Toggle -->
+            <!-- Theme Toggle - Public only -->
             <button class="theme-toggle" (click)="toggleTheme()"
                 [attr.aria-label]="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'">
-                @if (isDarkMode) {
-                <!-- Sun Icon -->
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="5" />
-                    <line x1="12" y1="1" x2="12" y2="3" />
-                    <line x1="12" y1="21" x2="12" y2="23" />
-                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                    <line x1="1" y1="12" x2="3" y2="12" />
-                    <line x1="21" y1="12" x2="23" y2="12" />
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                </svg>
-                } @else {
-                <!-- Moon Icon -->
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                </svg>
-                }
+                <mat-icon>{{ isDarkMode ? 'light_mode' : 'dark_mode' }}</mat-icon>
             </button>
-            <a href="/auth/login" class="login-btn">Login</a>
-            <a href="/auth/register-lab" class="btn btn-primary">Start Free Trial</a>
+            <a href="/auth/login" class="login-btn"><mat-icon>login</mat-icon> Login</a>
+            <a href="/auth/register-lab" class="btn btn-primary"><mat-icon
+                    style="font-size:18px;width:18px;height:18px;">rocket_launch</mat-icon> Start Free Trial</a>
         </div>
     </div>
 </header>
+}
+
+@if (isAdmin) {
+<header class="navbar admin-navbar">
+    <!-- Search or additional left items can go here if needed -->
+    <div class="admin-nav-left">
+        <nav class="admin-nav-links">
+            <a routerLink="/admin/branches" routerLinkActive="active" class="admin-nav-link"><mat-icon>store</mat-icon>
+                Branches</a>
+            <a routerLink="/admin/staff" routerLinkActive="active" class="admin-nav-link"><mat-icon>badge</mat-icon>
+                Staff</a>
+            <a routerLink="/admin/reports" routerLinkActive="active"
+                class="admin-nav-link"><mat-icon>analytics</mat-icon> Reports</a>
+            <a routerLink="/admin/patients" routerLinkActive="active" class="admin-nav-link"><mat-icon>masks</mat-icon>
+                Patients</a>
+        </nav>
+    </div>
+
+    <div class="nav-actions">
+        <!-- Notification Icon -->
+        <button class="icon-btn" matBadge="3" matBadgeColor="warn" matBadgeSize="small" aria-label="Notifications">
+            <mat-icon>notifications</mat-icon>
+        </button>
+
+        <div class="header-divider"></div>
+
+        <!-- Profile Dropdown (using mat-select as requested) -->
+        <div class="profile-select-container">
+            <mat-icon class="profile-avatar-icon">account_circle</mat-icon>
+            <mat-select panelClass="profile-select-panel" [value]="selectedProfileOption"
+                (selectionChange)="onProfileOptionChange($event.value)" placeholder="Dr. Admin">
+                <mat-select-trigger>
+                    <span class="profile-name-trigger">Dr. Admin</span>
+                </mat-select-trigger>
+                <mat-option value="profile">
+                    <mat-icon>person</mat-icon> Profile
+                </mat-option>
+                <mat-option value="settings">
+                    <mat-icon>settings</mat-icon> Settings
+                </mat-option>
+                <mat-option value="logout" class="logout-option">
+                    <mat-icon>logout</mat-icon> Logout
+                </mat-option>
+            </mat-select>
+        </div>
+    </div>
+</header>
+}

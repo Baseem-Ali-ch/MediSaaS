@@ -1,0 +1,231 @@
+<div class="page-container">
+  <div class="page-header flex-between">
+    <div class="header-title">
+      <h1>Branch Management</h1>
+      <p class="text-muted">Manage your laboratory branches</p>
+    </div>
+    <button class="btn btn-primary" (click)="openAddPanel()">
+      <mat-icon>add</mat-icon> Add Branch
+    </button>
+  </div>
+
+  <div class="filters-row">
+    <div class="search-box">
+      <mat-icon>search</mat-icon>
+      <input type="text" [(ngModel)]="searchQuery" placeholder="Search branches by name or city..." />
+    </div>
+    <div class="filter-select">
+      <mat-select [(ngModel)]="filterStatus" class="modern-select">
+        <mat-option value="All">All Status</mat-option>
+        <mat-option value="Active">Active</mat-option>
+        <mat-option value="Inactive">Inactive</mat-option>
+      </mat-select>
+    </div>
+    @if (searchQuery || filterStatus !== 'All') {
+    <button class="btn text-btn" (click)="clearFilters()">Clear Filters</button>
+    }
+  </div>
+
+  <p class="results-count text-muted">Showing {{ filteredBranches().length }} branches</p>
+
+  @if (filteredBranches().length > 0) {
+  <div class="branch-grid">
+    @for (branch of filteredBranches(); track branch.id; let i = $index) {
+    <div class="branch-card" [style.animation-delay]="(i * 100) + 'ms'">
+      @if (branch.isMain) {
+      <div class="main-branch-badge" title="Main Branch">
+        <mat-icon>star</mat-icon>
+      </div>
+      }
+
+      <div class="card-header">
+        <h3 class="branch-name">{{ branch.name }}</h3>
+        <span class="status-badge" [class.active]="branch.status === 'Active'"
+          [class.inactive]="branch.status === 'Inactive'">
+          {{ branch.status }}
+        </span>
+      </div>
+
+      <div class="card-body">
+        <div class="info-row"><mat-icon>mail</mat-icon> {{ branch.email }}</div>
+        <div class="info-row"><mat-icon>phone</mat-icon> {{ branch.phone }}</div>
+        <div class="info-row align-start">
+          <mat-icon>location_on</mat-icon>
+          <span>{{ branch.address }}, {{ branch.city }}, {{ branch.state }}, {{ branch.country }}</span>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <button class="btn btn-icon-text" (click)="openEditPanel(branch)"><mat-icon>edit</mat-icon> Edit</button>
+        <button class="btn btn-icon-text text-danger" [disabled]="branch.isMain" [class.disabled]="branch.isMain"
+          [title]="branch.isMain ? 'Main branch cannot be deleted' : ''" (click)="deleteBranch(branch)">
+          <mat-icon>delete</mat-icon> Delete
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+  } @else {
+  <div class="empty-state">
+    <mat-icon>corporate_fare</mat-icon>
+    <h3>No branches match your search</h3>
+    <p class="text-muted">Adjust your search filters or add a new branch.</p>
+  </div>
+  }
+</div>
+
+<!-- Slide Over Panel Overlay -->
+<div class="panel-overlay" [class.open]="isPanelOpen" (click)="closePanel()"></div>
+
+<!-- Slide Over Panel -->
+<div class="slide-panel" [class.open]="isPanelOpen">
+  <div class="panel-header-simple">
+    <div class="panel-title">
+      <mat-icon>domain</mat-icon>
+      <h2>{{ editMode ? 'Edit Branch' : 'Add New Branch' }}</h2>
+    </div>
+    <button class="close-btn" (click)="closePanel()"><mat-icon>close</mat-icon></button>
+  </div>
+
+  <div class="panel-body">
+    <form class="clean-form flex-col gap-24" (ngSubmit)="saveBranch()">
+
+      <div class="form-group">
+        <div class="floating-input-wrapper" [class.focused]="focus['name']"
+          [class.edited]="editMode && branchModel.name !== originalModel.name">
+          <mat-icon class="input-icon">corporate_fare</mat-icon>
+          <input type="text" id="name" name="name" [(ngModel)]="branchModel.name" required (focus)="setFocus('name')"
+            (blur)="clearFocus('name')" placeholder=" " />
+          <label for="name">Branch Name *</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="floating-input-wrapper" [class.focused]="focus['email']"
+          [class.edited]="editMode && branchModel.email !== originalModel.email"
+          [class.error]="!isValidEmail(branchModel.email) && branchModel.email !== ''">
+          <mat-icon class="input-icon">mail</mat-icon>
+          <input type="email" id="email" name="email" [(ngModel)]="branchModel.email" required
+            (focus)="setFocus('email')" (blur)="clearFocus('email')" placeholder=" " />
+          <label for="email">Email *</label>
+        </div>
+        @if (!isValidEmail(branchModel.email) && branchModel.email !== '') {
+        <div class="inline-validation error">Invalid email format</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <div class="floating-input-wrapper" [class.focused]="focus['phone']"
+          [class.edited]="editMode && branchModel.phone !== originalModel.phone">
+          <mat-icon class="input-icon">phone</mat-icon>
+          <input type="tel" id="phone" name="phone" [(ngModel)]="branchModel.phone" required
+            (keypress)="numericOnly($event)" (focus)="setFocus('phone')" (blur)="clearFocus('phone')" placeholder=" " />
+          <label for="phone">Phone *</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="floating-input-wrapper" [class.focused]="focus['address']"
+          [class.edited]="editMode && branchModel.address !== originalModel.address">
+          <mat-icon class="input-icon">pin_drop</mat-icon>
+          <input type="text" id="address" name="address" [(ngModel)]="branchModel.address" required
+            (focus)="setFocus('address')" (blur)="clearFocus('address')" placeholder=" " />
+          <label for="address">Address *</label>
+        </div>
+      </div>
+
+
+
+      <div class="form-group mat-select-group">
+        <div class="floating-input-wrapper" [class.focused]="focus['country']"
+          [class.edited]="editMode && branchModel.country !== originalModel.country">
+          <mat-icon class="input-icon">public</mat-icon>
+          <mat-select id="country" name="country" [(ngModel)]="branchModel.country" required
+            (openedChange)="countrySearch = ''" (selectionChange)="onCountryChange()" (focus)="setFocus('country')" (blur)="clearFocus('country')">
+            <div class="select-search-wrap" (keydown)="$event.stopPropagation()">
+              <mat-icon>search</mat-icon>
+              <input type="text" [(ngModel)]="countrySearch" name="cSearch" placeholder="Search countries..." autocomplete="off" />
+            </div>
+            @for (country of getFilteredCountries(); track country) {
+              <mat-option [value]="country">{{ country }}</mat-option>
+            }
+            @if (getFilteredCountries().length === 0) {
+              <div class="no-options-msg" style="padding: 16px; color: gray;">No countries found</div>
+            }
+          </mat-select>
+          <label for="country" [class.floated]="branchModel.country || focus['country']">Country *</label>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <div class="floating-input-wrapper" [class.focused]="focus['city']"
+            [class.edited]="editMode && branchModel.city !== originalModel.city">
+            <mat-icon class="input-icon">location_city</mat-icon>
+            <input type="text" id="city" name="city" [(ngModel)]="branchModel.city" required (focus)="setFocus('city')"
+              (blur)="clearFocus('city')" placeholder=" " />
+            <label for="city">City *</label>
+          </div>
+        </div>
+
+        <div class="form-group mat-select-group">
+          <div class="floating-input-wrapper" [class.focused]="focus['state']"
+            [class.edited]="editMode && branchModel.state !== originalModel.state">
+            <mat-icon class="input-icon">explore</mat-icon>
+            
+            @if (getFilteredStates().length > 0) {
+              <mat-select id="state" name="state" [(ngModel)]="branchModel.state"
+                (openedChange)="stateSearch = ''" (focus)="setFocus('state')" (blur)="clearFocus('state')">
+                <div class="select-search-wrap" (keydown)="$event.stopPropagation()">
+                  <mat-icon>search</mat-icon>
+                  <input type="text" [(ngModel)]="stateSearch" name="sSearch" placeholder="Search states..." autocomplete="off" />
+                </div>
+                @for (state of getFilteredStates(); track state) {
+                  <mat-option [value]="state">{{ state }}</mat-option>
+                }
+              </mat-select>
+              <label for="state" [class.floated]="branchModel.state || focus['state']">State</label>
+            } @else {
+              <input type="text" id="state" name="state" [(ngModel)]="branchModel.state" (focus)="setFocus('state')"
+                (blur)="clearFocus('state')" placeholder=" " />
+              <label for="state">State</label>
+            }
+            
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="status-toggle-container">
+          <span class="toggle-label">Status</span>
+          <div class="segmented-control">
+            <button type="button" [class.active]="branchModel.status === 'Active'"
+              (click)="branchModel.status = 'Active'">Active</button>
+            <button type="button" [class.active]="branchModel.status === 'Inactive'"
+              (click)="branchModel.status = 'Inactive'">Inactive</button>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <div class="panel-footer">
+    <button type="button" class="btn btn-secondary" (click)="closePanel()">Cancel</button>
+    <button type="submit" class="btn btn-primary"
+      [disabled]="editMode ? !hasChanges() || !formValid() || isSubmitting : !formValid() || isSubmitting"
+      (click)="saveBranch()">
+      @if (isSubmitting) {
+      <mat-icon class="spinner">autorenew</mat-icon> Saving...
+      } @else {
+      <mat-icon>check_circle</mat-icon> {{ editMode ? 'Save Changes' : 'Save Branch' }}
+      }
+    </button>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast-notification" [class.show]="toastMessage !== ''" [class.error]="toastIsError">
+  <mat-icon class="toast-icon">{{ toastIsError ? 'error_outline' : 'task_alt' }}</mat-icon>
+  <span>{{ toastMessage }}</span>
+</div>

@@ -4,8 +4,9 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NavbarComponent } from '../../../components/layout/navbar/navbar';
 import { FooterComponent } from '../../../components/layout/footer/footer';
 import { HttpService } from '../../../services/http.service';
-import { LoaderComponent } from '../../../components/loader/loader';
+import { LoaderService } from '../../../services/loader.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TokenService } from '../../../services/token.service';
 
 @Component({
   selector: 'app-verify-email',
@@ -14,8 +15,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     CommonModule,
     RouterLink,
     NavbarComponent,
-    FooterComponent, LoaderComponent
+    FooterComponent
   ],
+
   templateUrl: './verify-email.html',
   styleUrl: './verify-email.css'
 })
@@ -26,7 +28,10 @@ export class VerifyEmailPage implements OnInit {
   timer: any;
   isLoading = false;
 
-  constructor(private route: ActivatedRoute, private httpService: HttpService, private router: Router, private snack: MatSnackBar, private ngZone: NgZone) { }
+  constructor(private route: ActivatedRoute, private httpService: HttpService,
+    private router: Router, private snack: MatSnackBar,
+    private ngZone: NgZone, private tokenService: TokenService,
+    private loaderService: LoaderService) { }
 
   ngOnInit(): void {
     this.startCountdown();
@@ -62,21 +67,19 @@ export class VerifyEmailPage implements OnInit {
   }
 
   verifyEmail(token: string) {
-    this.isLoading = true
+    this.loaderService.show();
     this.httpService.get('/auth/verify-email', { token }).subscribe({
       next: (res: any) => {
-        this.isLoading = false
+        this.loaderService.hide();
         if (res.success) {
-          localStorage.setItem('access-token', res.token.accessToken)
-          localStorage.setItem('access-token', res.token.accessToken)
-
+          this.tokenService.setTokens(res.token.accessToken, res.token.refreshToken)
           this.router.navigate(['/admin/dashboard'])
         } else {
           this.snack.open(res.message, 'OK', { duration: 3000 });
         }
       },
       error: (err) => {
-        this.isLoading = false
+        this.loaderService.hide();
         console.log(err)
       }
     })

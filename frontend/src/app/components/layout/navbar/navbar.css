@@ -2,23 +2,34 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  height: 72px;
+  height: 64px;
+  /* Slightly shorter, more modern */
   display: flex;
   align-items: center;
   border-bottom: 1px solid var(--border);
-  /* Use the specified light blue but ensure it's translucent for glass effect */
-  background: rgba(227, 237, 252, 0.9); 
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: var(--transition);
+  transition: var(--transition-fast);
 }
 
-:host-context(.dark) .navbar {
-  background: rgba(15, 23, 42, 0.9);
+.public-navbar {
+  background: rgba(242, 250, 244, 0.9);
+  /* var(--bg-main) with opacity */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+html.dark .public-navbar {
+  background: rgba(8, 26, 16, 0.9);
   border-bottom-color: rgba(255, 255, 255, 0.05);
 }
 
-.navbar .container {
+/* Admin Navbar specific resets */
+.admin-navbar {
+  background-color: var(--bg-card);
+  padding: 0 24px;
+  justify-content: space-between;
+}
+
+.public-navbar .container {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -34,24 +45,50 @@
   gap: 8px;
 }
 
-.nav-links {
+/* Nav Links Base */
+.nav-links,
+.admin-nav-links {
   display: flex;
-  gap: 32px;
+  gap: 28px;
 }
 
-.nav-link {
-  font-weight: 600;
-  /* Use text-primary for better visibility on #E3EDFC background */
-  color: var(--text-primary); 
-  opacity: 0.8;
-  font-size: 0.95rem;
+.nav-link,
+.admin-nav-link {
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  transition: var(--transition-fast);
+  cursor: pointer;
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.nav-link:hover, .nav-link.active {
+.nav-link mat-icon,
+.admin-nav-link mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  transition: var(--transition-fast);
+}
+
+.admin-nav-link {
+  font-size: 0.85rem;
+}
+
+.nav-link:hover,
+.admin-nav-link:hover {
+  color: var(--text-primary);
+}
+
+.nav-link.active,
+.admin-nav-link.active {
   color: var(--primary);
-  opacity: 1;
+  font-weight: 600;
 }
 
+/* Actions */
 .nav-actions {
   display: flex;
   gap: 20px;
@@ -59,9 +96,19 @@
 }
 
 .login-btn {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-primary);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.login-btn mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
 }
 
 .login-btn:hover {
@@ -78,17 +125,174 @@
   justify-content: center;
   padding: 8px;
   border-radius: 50%;
-  transition: var(--transition);
+  transition: var(--transition-fast);
 }
 
 .theme-toggle:hover {
   background: rgba(0, 0, 0, 0.05);
 }
 
-:host-context(.dark) .theme-toggle:hover {
+html.dark .theme-toggle:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
+/* Admin specific components */
+.icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+}
+
+.icon-btn:hover {
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+html.dark .icon-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.header-divider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--border);
+}
+
+/* Profile Select Container */
+.profile-select-container {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  padding: 4px 6px;
+  border-radius: var(--radius-button);
+  transition: var(--transition-fast);
+}
+
+.profile-avatar-icon {
+  color: var(--text-secondary);
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.profile-select-container .mat-mdc-select {
+  width: 120px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.profile-select-container .mat-mdc-select-trigger {
+  color: var(--text-primary);
+}
+
+.profile-select-container>.mat-mdc-select-value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Dropdown Overlay Animation Linear Style */
+@keyframes slideDownDropdown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Material overrides for dropdown */
+.profile-select-panel {
+  background-color: var(--bg-card);
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+  animation: slideDownDropdown 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: top right;
+}
+
+.profile-select-panel .mat-mdc-option {
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--text-primary) !important;
+  transition: var(--transition-fast);
+}
+
+.profile-select-panel .mat-mdc-option:hover {
+  background-color: var(--bg-main) !important;
+}
+
+.profile-select-panel .mat-mdc-option .mat-icon {
+  margin-right: 8px;
+  color: var(--text-secondary);
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.profile-select-panel .logout-option {
+  border-top: 1px solid var(--border);
+  color: var(--danger) !important;
+}
+
+.profile-select-panel .logout-option .mat-icon {
+  color: var(--danger);
+}
+
+/* Hard-code Dark Theme for Overlay Container (Since it operates outside shadow DOM/encapsulation) */
+html.dark .profile-select-panel {
+  background-color: #0f2e1a !important;
+  border-color: #163d22 !important;
+}
+
+html.dark .profile-select-panel .mat-mdc-option {
+  color: #d4f0dc !important;
+}
+
+html.dark .profile-select-panel .mat-mdc-option:hover {
+  background-color: #081a10 !important;
+}
+
+html.dark .profile-select-panel .mat-mdc-option .mat-icon {
+  color: #7abf94 !important;
+}
+
+html.dark .profile-select-panel .logout-option {
+  border-top-color: #163d22;
+  color: #ef4444 !important;
+}
+
+html.dark .profile-select-panel .logout-option .mat-icon {
+  color: #ef4444 !important;
+}
+
+
 @media (max-width: 768px) {
-  .nav-links { display: none; }
+  .public-navbar .nav-links {
+    display: none;
+  }
+
+  .admin-nav-links {
+    display: none;
+  }
+
+  .profile-select-container .mat-mdc-select {
+    width: 80px;
+  }
 }

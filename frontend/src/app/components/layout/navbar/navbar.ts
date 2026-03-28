@@ -1,22 +1,29 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, ViewEncapsulation } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { MatSelectModule } from '@angular/material/select';
+import { MatIconModule } from '@angular/material/icon';
+import { MatBadgeModule } from '@angular/material/badge';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, CommonModule],
+  imports: [RouterLink, RouterLinkActive, CommonModule, MatSelectModule, MatIconModule, MatBadgeModule],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.css'
+  styleUrl: './navbar.css',
+  encapsulation: ViewEncapsulation.None
 })
 export class NavbarComponent implements OnInit {
+  @Input() isAdmin: boolean = false;
+  
   isDarkMode: boolean = false;
+  selectedProfileOption: string = '';
+
+  constructor(private router: Router) {}
 
   ngOnInit() {
-    // Check initial state from document class (which is set by App component)
     this.isDarkMode = document.documentElement.classList.contains('dark');
-    
-    // Fallback/Double check localStorage
     if (!this.isDarkMode) {
       const savedTheme = localStorage.getItem('theme');
       if (savedTheme === 'dark') {
@@ -35,5 +42,17 @@ export class NavbarComponent implements OnInit {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
     }
+  }
+
+  onProfileOptionChange(value: string) {
+    if (value === 'profile') {
+      this.router.navigate(['/admin/profile']);
+    } else if (value === 'settings') {
+      this.router.navigate(['/admin/profile']);
+    } else if (value === 'logout') {
+      // Logout
+    }
+    // reset selection so it acts like a menu
+    setTimeout(() => this.selectedProfileOption = '', 100);
   }
 }

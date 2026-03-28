@@ -8,7 +8,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { HttpService } from '../../../services/http.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { LoaderComponent } from '../../../components/loader/loader';
+import { MatIconModule } from '@angular/material/icon';
+
 
 @Component({
   selector: 'app-register',
@@ -21,7 +22,7 @@ import { LoaderComponent } from '../../../components/loader/loader';
     MatSelectModule,
     MatFormFieldModule,
     RouterLink,
-    LoaderComponent
+    MatIconModule
   ],
   templateUrl: './register.html',
   styleUrl: './register.css'
@@ -29,13 +30,6 @@ import { LoaderComponent } from '../../../components/loader/loader';
 export class RegisterPage implements OnInit {
   registerForm!: FormGroup;
   isLoading = false;
-
-  // labTypes = [
-  //   'Diagnostic Lab',
-  //   'Pathology Lab',
-  //   'Medical Laboratory',
-  //   'Clinic Lab'
-  // ];
 
   timezones = [
     '(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi',

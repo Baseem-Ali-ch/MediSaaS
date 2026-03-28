@@ -1,0 +1,204 @@
+<div class="profile-page-container">
+
+  <div class="profile-header">
+    <div class="user-avatar-title">
+      <div class="avatar-large" (mouseenter)="isHoveringAvatar = true" (mouseleave)="isHoveringAvatar = false">
+        @if (!profilePicture) {
+        <span>{{ formModel.name.charAt(0) || 'A' }}</span>
+        }
+        @if (profilePicture) {
+        <img [src]="profilePicture" alt="User Avatar" />
+        }
+
+        <!-- Hover Overlay -->
+        <div class="avatar-overlay" [class.show]="isHoveringAvatar" (click)="fileInput.click()">
+          <mat-icon>photo_camera</mat-icon>
+          <span>Change</span>
+          <input type="file" #fileInput hidden (change)="onPhotoUpload($event)" accept="image/*">
+        </div>
+      </div>
+
+      <div class="title-info">
+        <h1>{{ formModel.name || 'Admin User' }}</h1>
+        <p class="text-muted">Administrator Profile</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-layout">
+
+    <!-- Sidebar Navigation -->
+    <aside class="profile-nav">
+      <ul>
+        <li>
+          <button class="nav-btn" [class.active]="activeSection === 'profile'" (click)="switchSection('profile')">
+            <mat-icon>person</mat-icon>
+            Personal Details
+            @if (hasUnsavedProfile()) {
+            <span class="unsaved-dot"></span>
+            }
+          </button>
+        </li>
+        <li>
+          <button class="nav-btn" [class.active]="activeSection === 'password'" (click)="switchSection('password')">
+            <mat-icon>vpn_key</mat-icon>
+            Security & Password
+            @if (hasUnsavedPassword()) {
+            <span class="unsaved-dot"></span>
+            }
+          </button>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content Panels -->
+    <main class="profile-content">
+
+      <!-- Profile Section -->
+      @if (activeSection === 'profile') {
+      <div class="content-panel fade-slide-in">
+        <div class="panel-header">
+          <h2>Personal Information</h2>
+          <p class="text-muted">Update your details and contact information.</p>
+        </div>
+
+        <form class="clean-form grid-2" (ngSubmit)="saveProfile()">
+
+          <div class="form-group full-width">
+            <div class="floating-input-wrapper" [class.focused]="focusState['fullName']"
+              [class.edited]="formModel.name !== originalModel.name">
+              <mat-icon class="input-icon">badge</mat-icon>
+              <input type="text" id="fullName" name="fullName" [(ngModel)]="formModel.name"
+                (focus)="setFocus('fullName')" (blur)="clearFocus('fullName')" placeholder=" " />
+              <label for="fullName">Full Name</label>
+            </div>
+            @if (!formModel.name) {
+            <div class="inline-validation error">Name is required</div>
+            }
+          </div>
+
+          <div class="form-group">
+            <div class="floating-input-wrapper" [class.focused]="focusState['email']"
+              [class.edited]="formModel.email !== originalModel.email">
+              <mat-icon class="input-icon">mail</mat-icon>
+              <input type="email" id="email" name="email" [(ngModel)]="formModel.email" (focus)="setFocus('email')"
+                (blur)="clearFocus('email')" placeholder=" " readonly />
+              <label for="email">Email Address</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="floating-input-wrapper" [class.focused]="focusState['phone']"
+              [class.edited]="formModel.phone !== originalModel.phone">
+              <mat-icon class="input-icon">phone</mat-icon>
+              <input type="tel" id="phone" name="phone" [(ngModel)]="formModel.phone" (focus)="setFocus('phone')"
+                (blur)="clearFocus('phone')" placeholder=" " />
+              <label for="phone">Phone Number</label>
+            </div>
+          </div>
+
+          <div class="form-actions full-width">
+            @if (hasUnsavedProfile()) {
+            <button type="button" class="btn btn-secondary" (click)="discardProfileChanges()">Discard Changes</button>
+            }
+            <button type="submit" class="btn btn-primary" [disabled]="!hasUnsavedProfile() || isSavingProfile">
+              @if (isSavingProfile) {
+              <mat-icon class="spinner">autorenew</mat-icon> Saving...
+              } @else {
+              <mat-icon>save_as</mat-icon> Save Changes
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+      }
+
+      <!-- Password Section -->
+      @if (activeSection === 'password') {
+      <div class="content-panel fade-slide-in">
+        <div class="panel-header">
+          <h2>Change Password</h2>
+          <p class="text-muted">Ensure your account is using a long, random password to stay secure.</p>
+        </div>
+
+        <form class="clean-form" (ngSubmit)="updatePassword()">
+
+          <div class="form-group">
+            <div class="floating-input-wrapper" [class.focused]="focusState['currPass']">
+              <mat-icon class="input-icon">lock</mat-icon>
+              <input [type]="showPassword.current ? 'text' : 'password'" id="currPass" name="currPass"
+                [(ngModel)]="passModel.current" (focus)="setFocus('currPass')" (blur)="clearFocus('currPass')"
+                placeholder=" " />
+              <label for="currPass">Current Password</label>
+              <button type="button" class="icon-toggle" (click)="showPassword.current = !showPassword.current">
+                <mat-icon>{{ showPassword.current ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-divider" style="height: 1px; background: var(--border); margin: 8px 0;"></div>
+
+          <div class="form-group">
+            <div class="floating-input-wrapper" [class.focused]="focusState['newPass']">
+              <mat-icon class="input-icon">lock_outline</mat-icon>
+              <input [type]="showPassword.new ? 'text' : 'password'" id="newPass" name="newPass"
+                [(ngModel)]="passModel.new" (ngModelChange)="checkStrength()" (focus)="setFocus('newPass')"
+                (blur)="clearFocus('newPass')" placeholder=" " />
+              <label for="newPass">New Password</label>
+              <button type="button" class="icon-toggle" (click)="showPassword.new = !showPassword.new">
+                <mat-icon>{{ showPassword.new ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+            </div>
+
+            <!-- Live Strength Bar -->
+            @if (passModel.new) {
+            <div class="strength-indicator">
+              <div class="strength-bar-track">
+                <div class="strength-bar-fill" [ngClass]="strengthClass" [style.width]="strengthPercent + '%'"></div>
+              </div>
+              <span class="strength-text" [ngClass]="strengthClass">{{ strengthLabel }}</span>
+            </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <div class="floating-input-wrapper" [class.focused]="focusState['confirmPass']"
+              [class.error]="passModel.confirm && passModel.new !== passModel.confirm">
+              <mat-icon class="input-icon">lock_reset</mat-icon>
+              <input [type]="showPassword.confirm ? 'text' : 'password'" id="confirmPass" name="confirmPass"
+                [(ngModel)]="passModel.confirm" (focus)="setFocus('confirmPass')" (blur)="clearFocus('confirmPass')"
+                placeholder=" " />
+              <label for="confirmPass">Confirm Password</label>
+              <button type="button" class="icon-toggle" (click)="showPassword.confirm = !showPassword.confirm">
+                <mat-icon>{{ showPassword.confirm ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+            </div>
+
+            @if (passModel.confirm && passModel.new !== passModel.confirm) {
+            <div class="inline-validation error">
+              <mat-icon>error</mat-icon> Passwords do not match
+            </div>
+            }
+            @if (passModel.new && passModel.confirm && passModel.new === passModel.confirm) {
+            <div class="inline-validation success">
+              <mat-icon>check_circle</mat-icon> Passwords match
+            </div>
+            }
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" [disabled]="!canUpdatePassword() || isUpdatingPassword">
+              @if (isUpdatingPassword) {
+              <mat-icon class="spinner">autorenew</mat-icon> Updating...
+              } @else {
+              <mat-icon>shield</mat-icon> Update Password
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+      }
+
+    </main>
+  </div>
+</div>

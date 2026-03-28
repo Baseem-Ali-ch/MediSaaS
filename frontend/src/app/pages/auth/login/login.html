@@ -58,9 +58,15 @@
                                 </div>
 
                                 <div class="form-actions mt-30">
-                                    <button type="submit" class="btn btn-primary btn-lg w-full" [disabled]="loginForm.invalid">
-                                        Sign In to Account
+                                    <button type="submit" class="btn btn-primary btn-lg w-full" [disabled]="loginForm.invalid || isLoading">
+                                        @if (isLoading) {
+                                            <mat-icon class="spinner">autorenew</mat-icon> Signing in...
+                                        } @else {
+                                            Sign In to Account
+                                        }
                                     </button>
+
+
                                 </div>
                             </div>
                         </div>

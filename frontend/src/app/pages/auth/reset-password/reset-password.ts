@@ -4,6 +4,9 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractContro
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { NavbarComponent } from '../../../components/layout/navbar/navbar';
 import { FooterComponent } from '../../../components/layout/footer/footer';
+import { HttpService } from '../../../services/http.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-reset-password',
@@ -13,8 +16,11 @@ import { FooterComponent } from '../../../components/layout/footer/footer';
     ReactiveFormsModule,
     RouterLink,
     NavbarComponent,
-    FooterComponent
+    FooterComponent,
+    MatIconModule
   ],
+
+
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.css'
 })
@@ -24,11 +30,12 @@ export class ResetPasswordPage implements OnInit {
   showConfirmPassword = false;
   isSubmitted = false;
   token: string | null = null;
+  isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute, private httpService: HttpService, private snack: MatSnackBar
+  ) { }
 
   ngOnInit(): void {
     this.token = this.route.snapshot.queryParamMap.get('token');
@@ -72,8 +79,23 @@ export class ResetPasswordPage implements OnInit {
   }
 
   onSubmit(): void {
+    this.isLoading = true
     if (this.resetForm.valid) {
-      console.log('Password Reset Submitted!', { ...this.resetForm.value, token: this.token });
+      this.httpService.post(`/auth/reset-password?token=${this.token}`, this.resetForm.value).subscribe({
+        next: (res: any) => {
+          this.isLoading = false;
+          if (res.success) {
+            this.snack.open(res.message, 'OK', { duration: 3000 });
+          } else {
+            this.snack.open(res.message, 'OK', { duration: 3000 });
+          }
+        },
+        error: (err) => {
+          this.isLoading = false;
+          console.log(err);
+          this.snack.open('Failed to reset password', 'OK', { duration: 3000 });
+        }
+      })
       // Simulate API call
       this.isSubmitted = true;
     } else {

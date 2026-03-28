@@ -9,6 +9,9 @@ import { ForgotPasswordPage } from './pages/auth/forgot-password/forgot-password
 import { VerifyEmailPage } from './pages/auth/verify-email/verify-email';
 import { ResetPasswordPage } from './pages/auth/reset-password/reset-password';
 
+import { AdminLayoutComponent } from './pages/admin-portal/layout/admin-layout.component';
+import { DashboardComponent } from './pages/admin-portal/dashboard/dashboard.component';
+
 export const routes: Routes = [
     { path: '', component: Home },
     { path: 'home', component: Home },
@@ -25,6 +28,18 @@ export const routes: Routes = [
             { path: 'forgot-password', component: ForgotPasswordPage },
             { path: 'verify-email', component: VerifyEmailPage },
             { path: 'reset-password', component: ResetPasswordPage }
+        ]
+    },
+
+    {
+        path: 'admin',
+        component: AdminLayoutComponent,
+        children: [
+            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+            { path: 'dashboard', component: DashboardComponent },
+            { path: 'profile', loadComponent: () => import('./pages/admin-portal/profile/profile.component').then(m => m.ProfileComponent) },
+            { path: 'lab-management', loadComponent: () => import('./pages/admin-portal/configuration/lab-management/lab-management.component').then(m => m.LabManagementComponent) },
+            { path: 'branch-management', loadComponent: () => import('./pages/admin-portal/configuration/branches/branches.component').then(m => m.BranchesComponent) }
         ]
     }
 ];

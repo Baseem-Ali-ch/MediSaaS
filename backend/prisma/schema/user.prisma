@@ -8,6 +8,8 @@ model User {
   emailVerified            Boolean   @default(false)
   emailVerificationToken   String?
   emailVerificationExpires DateTime?
+  jwtToken                 String?
+  jwtTokenExpires          DateTime?
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
 
