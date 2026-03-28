@@ -4,6 +4,6 @@ dist
 /src/generated/prisma
 
 notes.md
-api-test-medisaas
-logs
+api-test-medisaas/
+logs/
 package-lock.json
