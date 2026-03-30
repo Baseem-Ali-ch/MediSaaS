@@ -13,6 +13,4 @@ export class LabRepository extends BaseRepository<
   async findByEmail(email: string): Promise<Lab | null> {
     return this.prisma.lab.findFirst({ where: { email } });
   }
-
-
 }

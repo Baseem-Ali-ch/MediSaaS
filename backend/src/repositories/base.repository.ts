@@ -1,9 +1,9 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 export abstract class BaseRepository<T, CreateInput, UpdateInput> {
   constructor(
     protected readonly prisma: PrismaClient,
-    private readonly modelName: keyof PrismaClient
+    private readonly modelName: keyof PrismaClient,
   ) {}
 
   private get model() {

@@ -1,6 +1,6 @@
-import { PrismaClient, User, Prisma } from "@prisma/client";
+import { PrismaClient, User, Prisma, Lab } from "@prisma/client";
 import { BaseRepository } from "./base.repository";
-import bcrypt from 'bcrypt'
+import bcrypt from "bcrypt";
 
 export class UserRepository extends BaseRepository<
   User,
@@ -32,4 +32,23 @@ export class UserRepository extends BaseRepository<
     return await bcrypt.compare(password, user.password);
   }
 
+  async getLabByUserId(userId: number) {
+    const result = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { lab: true },
+    });
+    return result?.lab ?? null;
+  }
+
+  async getBranchesByUserId(userId: number) {
+    return this.prisma.branch.findMany({
+      where: {
+        lab: {
+          users: {
+            some: { id: userId },
+          },
+        },
+      },
+    });
+  }
 }

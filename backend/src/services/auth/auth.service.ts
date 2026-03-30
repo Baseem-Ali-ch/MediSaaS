@@ -52,6 +52,8 @@ export const registerLab = async (data: RegisterLabData) => {
     city: data.city,
     state: data.state,
     country: data.country,
+    status: 'Active',
+    isMain: true,
     lab: { connect: { id: lab.id } },
   });
 

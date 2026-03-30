@@ -15,6 +15,15 @@ export const authenticate = (
     (req as any).user = decoded;
     next();
   } catch (err: Error | any) {
-    return res.status(403).json({ message: "Invalid token", error: err.message });
+    // return res.status(401).json({ message: "Invalid token", error: err.message });
+
+    if (err.name === "TokenExpiredError") {
+      return res
+        .status(401)
+        .json({ message: "Invalid token", error: "jwt expired" }); 
+    }
+    if (err.name === "JsonWebTokenError") {
+      return res.status(403).json({ message: "Invalid token" });
+    }
   }
 };
