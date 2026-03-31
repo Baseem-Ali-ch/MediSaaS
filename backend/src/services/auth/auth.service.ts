@@ -52,7 +52,7 @@ export const registerLab = async (data: RegisterLabData) => {
     city: data.city,
     state: data.state,
     country: data.country,
-    status: 'Active',
+    status: "Active",
     isMain: true,
     lab: { connect: { id: lab.id } },
   });
@@ -70,7 +70,7 @@ export const registerLab = async (data: RegisterLabData) => {
     branch: { connect: { id: branch.id } },
   });
 
-  await sendVerificationUrl(data.labEmail, verificationToken);
+  sendVerificationUrl(data.labEmail, verificationToken);
 };
 
 export const login = async (data: { email: string; password: string }) => {
@@ -84,12 +84,17 @@ export const login = async (data: { email: string; password: string }) => {
     throw new Error("Invalid email or password");
   }
 
-  const accessToken = generateToken({ userId: user.id, role: user.role }, "15m");
-  const refreshToken = generateToken({ userId: user.id, role: user.role }, "7d");
+  const accessToken = generateToken(
+    { userId: user.id, role: user.role },
+    "15m",
+  );
+  const refreshToken = generateToken(
+    { userId: user.id, role: user.role },
+    "7d",
+  );
 
   return { user, accessToken, refreshToken };
 };
-
 
 export const verifyEmail = async (data: { token: string }) => {
   const user = await userRepo.findByToken(data.token);
@@ -102,8 +107,14 @@ export const verifyEmail = async (data: { token: string }) => {
     emailVerificationToken: null,
   });
 
-  const accessToken = generateToken({ userId: user.id, role: user.role }, "15m");
-  const refreshToken = generateToken({ userId: user.id, role: user.role }, "7d");
+  const accessToken = generateToken(
+    { userId: user.id, role: user.role },
+    "15m",
+  );
+  const refreshToken = generateToken(
+    { userId: user.id, role: user.role },
+    "7d",
+  );
 
   return { user, accessToken, refreshToken };
 };

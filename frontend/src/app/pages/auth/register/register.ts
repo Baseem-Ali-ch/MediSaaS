@@ -1,6 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { NavbarComponent } from '../../../components/layout/navbar/navbar';
 import { FooterComponent } from '../../../components/layout/footer/footer';
@@ -9,7 +16,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { HttpService } from '../../../services/http.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
-
 
 @Component({
   selector: 'app-register',
@@ -22,10 +28,10 @@ import { MatIconModule } from '@angular/material/icon';
     MatSelectModule,
     MatFormFieldModule,
     RouterLink,
-    MatIconModule
+    MatIconModule,
   ],
   templateUrl: './register.html',
-  styleUrl: './register.css'
+  styleUrl: './register.css',
 })
 export class RegisterPage implements OnInit {
   registerForm!: FormGroup;
@@ -35,7 +41,7 @@ export class RegisterPage implements OnInit {
     '(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi',
     '(UTC+00:00) London, Dublin, Edinburgh',
     '(UTC-05:00) Eastern Time (US & Canada)',
-    '(UTC+09:00) Osaka, Sapporo, Tokyo'
+    '(UTC+09:00) Osaka, Sapporo, Tokyo',
   ];
 
   currencies = ['INR', 'USD', 'EUR', 'GBP'];
@@ -44,46 +50,49 @@ export class RegisterPage implements OnInit {
     private fb: FormBuilder,
     private httpService: HttpService,
     private router: Router,
-    private snack: MatSnackBar
-  ) { }
+    private snack: MatSnackBar,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit(): void {
     this.initForm();
   }
 
   initForm(): void {
-    this.registerForm = this.fb.group({
-      // Section 1: Lab Details
-      labName: ['', [Validators.required]],
-      labType: [''],
-      registrationNumber: [''],
-      labEmail: ['', [Validators.required, Validators.email]],
-      labPhone: ['', [Validators.required]],
+    this.registerForm = this.fb.group(
+      {
+        // Section 1: Lab Details
+        labName: ['', [Validators.required]],
+        labType: [''],
+        registrationNumber: [''],
+        labEmail: ['', [Validators.required, Validators.email]],
+        labPhone: ['', [Validators.required]],
 
-      // Section 2: Address Information
-      address1: ['', [Validators.required]],
-      address2: [''],
-      city: ['', [Validators.required]],
-      state: ['', [Validators.required]],
-      country: ['', [Validators.required]],
-      postalCode: ['', [Validators.required]],
+        // Section 2: Address Information
+        address1: ['', [Validators.required]],
+        address2: [''],
+        city: ['', [Validators.required]],
+        state: ['', [Validators.required]],
+        country: ['', [Validators.required]],
+        postalCode: ['', [Validators.required]],
 
-      // Section 3: Owner Details
-      ownerName: ['', [Validators.required]],
-      ownerEmail: ['', [Validators.required, Validators.email]],
-      ownerPhone: ['', [Validators.required]],
+        // Section 3: Owner Details
+        ownerName: ['', [Validators.required]],
+        ownerEmail: ['', [Validators.required, Validators.email]],
+        ownerPhone: ['', [Validators.required]],
 
-      // Section 4: Account Security
-      password: ['', [
-        Validators.required,
-        Validators.minLength(8),
-        this.passwordPatternValidator
-      ]],
-      confirmPassword: ['', [Validators.required]],
+        // Section 4: Account Security
+        password: [
+          '',
+          [Validators.required, Validators.minLength(8), this.passwordPatternValidator],
+        ],
+        confirmPassword: ['', [Validators.required]],
 
-      // Section 6: Terms
-      agreeTerms: [false, [Validators.requiredTrue]]
-    }, { validators: this.passwordMatchValidator });
+        // Section 6: Terms
+        agreeTerms: [false, [Validators.requiredTrue]],
+      },
+      { validators: this.passwordMatchValidator },
+    );
   }
 
   passwordPatternValidator(control: AbstractControl): ValidationErrors | null {
@@ -108,26 +117,29 @@ export class RegisterPage implements OnInit {
       this.isLoading = true;
       this.httpService.post('/auth/register-lab', this.registerForm.value).subscribe({
         next: (res: any) => {
-          this.isLoading = false;
           if (res.success) {
             this.router.navigate(['/auth/verify-email']);
           } else {
+            this.isLoading = false;
             this.snack.open(res.message, 'OK', { duration: 3000 });
           }
         },
         error: (err) => {
-          this.isLoading = false;
           console.log(err);
           this.snack.open('Failed to register', 'OK', { duration: 3000 });
-        }
-      })
+        },
+        complete: () => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
+      });
     } else {
       this.markFormGroupTouched(this.registerForm);
     }
   }
 
   private markFormGroupTouched(formGroup: FormGroup) {
-    Object.values(formGroup.controls).forEach(control => {
+    Object.values(formGroup.controls).forEach((control) => {
       control.markAsTouched();
       if ((control as any).controls) {
         this.markFormGroupTouched(control as FormGroup);

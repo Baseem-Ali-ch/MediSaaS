@@ -1,11 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmationPopupComponent } from '../../../../components/popup/confirmation/confirmation.component';
+import { LoaderService } from '../../../../services/loader.service';
+import { HttpService } from '../../../../services/http.service';
 
 export interface LabData {
+  id?: string;
   name: string;
   email: string;
   phone: string;
@@ -23,7 +26,7 @@ export interface LabData {
   standalone: true,
   imports: [CommonModule, FormsModule, MatIconModule, MatDialogModule],
   templateUrl: './lab-management.component.html',
-  styleUrl: './lab-management.component.css'
+  styleUrl: './lab-management.component.css',
 })
 export class LabManagementComponent implements OnInit {
   isEditMode = false;
@@ -33,30 +36,56 @@ export class LabManagementComponent implements OnInit {
   toastIsError = false;
 
   originalData: LabData = {
-    name: 'MediSaaS Central Lab',
-    email: 'lab@medisaas.com',
-    phone: '+1 (555) 123-4567',
-    registrationNo: 'REG-991A4B',
-    address1: '123 Medical Drive',
-    address2: 'Suite 400',
-    city: 'San Francisco',
-    state: 'CA',
-    country: 'United States',
-    postalCode: '94110'
+    name: '',
+    email: '',
+    phone: '',
+    registrationNo: '',
+    address1: '',
+    address2: '',
+    city: '',
+    state: '',
+    country: '',
+    postalCode: '',
   };
 
   labData: LabData = { ...this.originalData };
 
   focus: Record<string, boolean> = {};
 
-  constructor(private dialog: MatDialog) { }
+  constructor(
+    private dialog: MatDialog,
+    private loaderService: LoaderService,
+    private httpService: HttpService,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit() {
-    // Initial fetch mock
+    this.getLabDetails();
   }
 
-  setFocus(field: string) { this.focus[field] = true; }
-  clearFocus(field: string) { this.focus[field] = false; }
+  getLabDetails() {
+    this.loaderService.show();
+    this.httpService.get('/admin/lab').subscribe({
+      next: (res: any) => {
+        this.originalData = { ...res.data };
+        this.labData = { ...res.data };
+      },
+      error: (err) => {
+        this.showToast('Failed to fetch lab details.', true);
+      },
+      complete: () => {
+        this.loaderService.hide();
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  setFocus(field: string) {
+    this.focus[field] = true;
+  }
+  clearFocus(field: string) {
+    this.focus[field] = false;
+  }
 
   enableEditMode() {
     this.isEditMode = true;
@@ -75,18 +104,20 @@ export class LabManagementComponent implements OnInit {
   }
 
   labFormValid(): boolean {
-    return !!this.labData.name &&
+    return (
+      !!this.labData.name &&
       this.isValidEmail(this.labData.email) &&
       !!this.labData.phone &&
       !!this.labData.address1 &&
       !!this.labData.city &&
       !!this.labData.state &&
       !!this.labData.country &&
-      this.isValidPostal(this.labData.postalCode);
+      this.isValidPostal(this.labData.postalCode)
+    );
   }
 
   numericOnly(event: KeyboardEvent) {
-    const charCode = (event.which) ? event.which : event.keyCode;
+    const charCode = event.which ? event.which : event.keyCode;
     if (charCode > 31 && (charCode < 48 || charCode > 57)) {
       event.preventDefault();
     }
@@ -101,10 +132,10 @@ export class LabManagementComponent implements OnInit {
           message: 'You have unsaved changes. Are you sure you want to discard them?',
           confirmText: 'Discard',
           cancelText: 'Keep Editing',
-          isDestructive: true
-        }
+          isDestructive: true,
+        },
       });
-      dialogRef.afterClosed().subscribe(result => {
+      dialogRef.afterClosed().subscribe((result) => {
         if (result) {
           this.labData = { ...this.originalData };
           this.isEditMode = false;
@@ -119,17 +150,35 @@ export class LabManagementComponent implements OnInit {
     if (!this.labFormValid()) return;
 
     this.isSaving = true;
-    setTimeout(() => {
-      this.originalData = { ...this.labData };
+    const labId = this.labData.id;
+
+    if (!labId) {
       this.isSaving = false;
-      this.isEditMode = false;
-      this.showToast('Lab details updated successfully', false);
-    }, 800);
+      this.showToast('Lab ID is missing.', true);
+      return;
+    }
+
+    this.httpService.patch(`/admin/lab/${labId}`, this.labData).subscribe({
+      next: (res: any) => {
+        this.originalData = { ...this.labData };
+        this.showToast('Lab details updated successfully', false);
+      },
+      error: (err) => {
+        this.showToast('Failed to update lab details', true);
+      },
+      complete: () => {
+        this.isSaving = false;
+        this.isEditMode = false;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   showToast(msg: string, isError: boolean) {
     this.toastMessage = msg;
     this.toastIsError = isError;
-    setTimeout(() => { this.toastMessage = ''; }, 3500);
+    setTimeout(() => {
+      this.toastMessage = '';
+    }, 3500);
   }
 }

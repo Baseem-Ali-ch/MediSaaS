@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,7 +14,7 @@ import { ToastService } from '../../../services/toast.service';
   imports: [CommonModule, FormsModule, MatIconModule, MatDialogModule],
 
   templateUrl: './profile.component.html',
-  styleUrl: './profile.component.css'
+  styleUrl: './profile.component.css',
 })
 export class ProfileComponent implements OnInit {
   activeSection: 'profile' | 'password' = 'profile';
@@ -24,13 +24,13 @@ export class ProfileComponent implements OnInit {
   originalModel = {
     name: '',
     email: '',
-    phone: ''
+    phone: '',
   };
 
   formModel = {
     name: '',
     email: '',
-    phone: ''
+    phone: '',
   };
 
   focusState: Record<string, boolean> = {};
@@ -40,13 +40,13 @@ export class ProfileComponent implements OnInit {
   passModel = {
     current: '',
     new: '',
-    confirm: ''
+    confirm: '',
   };
 
   showPassword = {
     current: false,
     new: false,
-    confirm: false
+    confirm: false,
   };
 
   strengthPercent = 0;
@@ -58,26 +58,29 @@ export class ProfileComponent implements OnInit {
     private dialog: MatDialog,
     private httpService: HttpService,
     private toastService: ToastService,
-    private loaderService: LoaderService
-  ) { }
+    private loaderService: LoaderService,
+    private cdr: ChangeDetectorRef,
+  ) {}
 
   ngOnInit() {
-    this.getProfileData()
+    this.getProfileData();
   }
 
   getProfileData() {
     this.loaderService.show();
     this.httpService.get('/admin/profile').subscribe({
       next: (res: any) => {
-        this.originalModel = { ...res.user }
-        this.formModel = { ...res.user }
-        this.loaderService.hide();
+        this.originalModel = { ...res.user };
+        this.formModel = { ...res.user };
       },
       error: (err) => {
-        this.loaderService.hide();
         this.showToast('Failed to fetch details.');
-      }
-    })
+      },
+      complete: () => {
+        this.loaderService.hide();
+        this.cdr.detectChanges();
+      },
+    });
   }
   setFocus(field: string) {
     this.focusState[field] = true;
@@ -96,8 +99,8 @@ export class ProfileComponent implements OnInit {
           message: 'You have unsaved changes in your profile. Discard them?',
           confirmText: 'Discard',
           cancelText: 'Keep Editing',
-          isDestructive: true
-        }
+          isDestructive: true,
+        },
       });
       dialogRef.afterClosed().subscribe((result: boolean) => {
         if (result) {
@@ -116,8 +119,8 @@ export class ProfileComponent implements OnInit {
           message: 'You have entered password data. Discard it?',
           confirmText: 'Discard',
           cancelText: 'Keep Editing',
-          isDestructive: true
-        }
+          isDestructive: true,
+        },
       });
       dialogRef.afterClosed().subscribe((result: boolean) => {
         if (result) {
@@ -132,9 +135,11 @@ export class ProfileComponent implements OnInit {
   }
 
   hasUnsavedProfile(): boolean {
-    return this.formModel.name !== this.originalModel.name ||
+    return (
+      this.formModel.name !== this.originalModel.name ||
       this.formModel.email !== this.originalModel.email ||
-      this.formModel.phone !== this.originalModel.phone;
+      this.formModel.phone !== this.originalModel.phone
+    );
   }
 
   discardProfileChanges() {
@@ -142,7 +147,9 @@ export class ProfileComponent implements OnInit {
   }
 
   hasUnsavedPassword(): boolean {
-    return this.passModel.current !== '' || this.passModel.new !== '' || this.passModel.confirm !== '';
+    return (
+      this.passModel.current !== '' || this.passModel.new !== '' || this.passModel.confirm !== ''
+    );
   }
 
   discardPasswordChanges() {
@@ -155,7 +162,7 @@ export class ProfileComponent implements OnInit {
     if (input.files && input.files[0]) {
       const file = input.files[0];
       const reader = new FileReader();
-      reader.onload = e => this.profilePicture = reader.result as string;
+      reader.onload = (e) => (this.profilePicture = reader.result as string);
       reader.readAsDataURL(file);
       this.showToast('Profile photo updated successfully!');
     }
@@ -169,16 +176,14 @@ export class ProfileComponent implements OnInit {
       next: (res) => {
         this.isSavingProfile = false;
         this.originalModel = { ...this.formModel };
-        this.discardProfileChanges()
+        this.discardProfileChanges();
         this.showToast('Profile details saved.');
       },
       error: (err) => {
-        this.isSavingProfile = false
-        this.showToast('Failed to update.')
-      }
-    })
-
-
+        this.isSavingProfile = false;
+        this.showToast('Failed to update.');
+      },
+    });
   }
 
   checkStrength() {
@@ -210,11 +215,13 @@ export class ProfileComponent implements OnInit {
   }
 
   canUpdatePassword() {
-    return this.passModel.current &&
+    return (
+      this.passModel.current &&
       this.passModel.new &&
       this.passModel.confirm &&
       this.passModel.new === this.passModel.confirm &&
-      this.strengthPercent >= 66; // Enforce at least fair password
+      this.strengthPercent >= 66
+    ); // Enforce at least fair password
   }
 
   updatePassword() {
@@ -229,13 +236,10 @@ export class ProfileComponent implements OnInit {
       },
       error: (err) => {
         this.isUpdatingPassword = false;
-        this.showToast('Failed to update.')
-      }
-    })
-    setTimeout(() => {
-
-
-    }, 1000);
+        this.showToast('Failed to update.');
+      },
+    });
+    setTimeout(() => {}, 1000);
   }
 
   showToast(msg: string) {

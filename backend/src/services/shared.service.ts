@@ -7,7 +7,7 @@ export const sendVerificationUrl = async (email: string, token: string) => {
   const html = await loadTemplate("verify-email.html", {
     VERIFY_URL: `${process.env.FRONTEND_URL}/auth/verify-email?token=${token}`,
   });
-  const transporter = await emailService();
+  const transporter =  emailService();
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to: email,
