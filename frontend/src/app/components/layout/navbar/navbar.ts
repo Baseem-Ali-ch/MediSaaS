@@ -5,22 +5,36 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
 import { Router } from '@angular/router';
+import { TokenService } from '../../../services/token.service';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, CommonModule, MatSelectModule, MatIconModule, MatBadgeModule],
+  imports: [
+    RouterLink,
+    RouterLinkActive,
+    CommonModule,
+    MatSelectModule,
+    MatIconModule,
+    MatBadgeModule,
+    MatMenuModule,
+    MatButtonModule,
+  ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class NavbarComponent implements OnInit {
   @Input() isAdmin: boolean = false;
-  
-  isDarkMode: boolean = false;
-  selectedProfileOption: string = '';
 
-  constructor(private router: Router) {}
+  isDarkMode: boolean = false;
+
+  constructor(
+    private router: Router,
+    private tokenService: TokenService,
+  ) {}
 
   ngOnInit() {
     this.isDarkMode = document.documentElement.classList.contains('dark');
@@ -45,14 +59,13 @@ export class NavbarComponent implements OnInit {
   }
 
   onProfileOptionChange(value: string) {
-    if (value === 'profile') {
+    if (value === 'profile' || value === 'settings') {
       this.router.navigate(['/admin/profile']);
-    } else if (value === 'settings') {
-      this.router.navigate(['/admin/profile']);
-    } else if (value === 'logout') {
-      // Logout
     }
-    // reset selection so it acts like a menu
-    setTimeout(() => this.selectedProfileOption = '', 100);
+  }
+
+  logout() {
+    this.tokenService.clearTokens();
+    this.router.navigate(['/auth/login']);
   }
 }

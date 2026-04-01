@@ -6,6 +6,8 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmationPopupComponent } from '../../../../components/popup/confirmation/confirmation.component';
 import { LoaderService } from '../../../../services/loader.service';
 import { HttpService } from '../../../../services/http.service';
+import { ToastService } from '../../../../services/toast.service';
+import { finalize } from 'rxjs';
 
 export interface LabData {
   id?: string;
@@ -26,14 +28,11 @@ export interface LabData {
   standalone: true,
   imports: [CommonModule, FormsModule, MatIconModule, MatDialogModule],
   templateUrl: './lab-management.component.html',
-  styleUrl: './lab-management.component.css',
+  styleUrls: ['./lab-management.component.css', '../../../../../assets/styles/form.css'],
 })
 export class LabManagementComponent implements OnInit {
   isEditMode = false;
   isSaving = false;
-
-  toastMessage = '';
-  toastIsError = false;
 
   originalData: LabData = {
     name: '',
@@ -47,15 +46,14 @@ export class LabManagementComponent implements OnInit {
     country: '',
     postalCode: '',
   };
-
   labData: LabData = { ...this.originalData };
-
   focus: Record<string, boolean> = {};
 
   constructor(
     private dialog: MatDialog,
     private loaderService: LoaderService,
     private httpService: HttpService,
+    private toastService: ToastService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -65,19 +63,23 @@ export class LabManagementComponent implements OnInit {
 
   getLabDetails() {
     this.loaderService.show();
-    this.httpService.get('/admin/lab').subscribe({
-      next: (res: any) => {
-        this.originalData = { ...res.data };
-        this.labData = { ...res.data };
-      },
-      error: (err) => {
-        this.showToast('Failed to fetch lab details.', true);
-      },
-      complete: () => {
-        this.loaderService.hide();
-        this.cdr.detectChanges();
-      },
-    });
+    this.httpService
+      .get('/admin/lab')
+      .pipe(
+        finalize(() => {
+          this.loaderService.hide();
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (res: any) => {
+          this.originalData = { ...res.data };
+          this.labData = { ...res.data };
+        },
+        error: (err) => {
+          this.toastService.show('Failed to fetch lab details.');
+        },
+      });
   }
 
   setFocus(field: string) {
@@ -154,31 +156,27 @@ export class LabManagementComponent implements OnInit {
 
     if (!labId) {
       this.isSaving = false;
-      this.showToast('Lab ID is missing.', true);
+      this.toastService.show('Lab ID is missing.');
       return;
     }
 
-    this.httpService.patch(`/admin/lab/${labId}`, this.labData).subscribe({
-      next: (res: any) => {
-        this.originalData = { ...this.labData };
-        this.showToast('Lab details updated successfully', false);
-      },
-      error: (err) => {
-        this.showToast('Failed to update lab details', true);
-      },
-      complete: () => {
-        this.isSaving = false;
-        this.isEditMode = false;
-        this.cdr.detectChanges();
-      },
-    });
-  }
-
-  showToast(msg: string, isError: boolean) {
-    this.toastMessage = msg;
-    this.toastIsError = isError;
-    setTimeout(() => {
-      this.toastMessage = '';
-    }, 3500);
+    this.httpService
+      .patch(`/admin/lab/${labId}`, this.labData)
+      .pipe(
+        finalize(() => {
+          this.isSaving = false;
+          this.isEditMode = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (res: any) => {
+          this.originalData = { ...this.labData };
+          this.toastService.show('Lab details updated successfully');
+        },
+        error: (err) => {
+          this.toastService.show('Failed to update lab details');
+        },
+      });
   }
 }

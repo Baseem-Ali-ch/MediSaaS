@@ -7,19 +7,15 @@ import { HttpService } from '../../../services/http.service';
 import { LoaderService } from '../../../services/loader.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TokenService } from '../../../services/token.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-verify-email',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    NavbarComponent,
-    FooterComponent
-  ],
+  imports: [CommonModule, RouterLink, NavbarComponent, FooterComponent],
 
   templateUrl: './verify-email.html',
-  styleUrl: './verify-email.css'
+  styleUrl: './verify-email.css',
 })
 export class VerifyEmailPage implements OnInit {
   email = 'user@example.com'; // This would usually come from a service or state
@@ -28,23 +24,27 @@ export class VerifyEmailPage implements OnInit {
   timer: any;
   isLoading = false;
 
-  constructor(private route: ActivatedRoute, private httpService: HttpService,
-    private router: Router, private snack: MatSnackBar,
-    private ngZone: NgZone, private tokenService: TokenService,
-    private loaderService: LoaderService) { }
+  constructor(
+    private route: ActivatedRoute,
+    private httpService: HttpService,
+    private router: Router,
+    private snack: MatSnackBar,
+    private ngZone: NgZone,
+    private tokenService: TokenService,
+    private loaderService: LoaderService,
+  ) {}
 
   ngOnInit(): void {
     this.startCountdown();
 
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       const token = params['token'];
 
       if (token) {
-        this.verifyEmail(token)
+        this.verifyEmail(token);
       }
     });
   }
-
 
   startCountdown(): void {
     this.ngZone.run(() => {
@@ -68,21 +68,26 @@ export class VerifyEmailPage implements OnInit {
 
   verifyEmail(token: string) {
     this.loaderService.show();
-    this.httpService.get('/auth/verify-email', { token }).subscribe({
-      next: (res: any) => {
-        this.loaderService.hide();
-        if (res.success) {
-          this.tokenService.setTokens(res.token.accessToken, res.token.refreshToken)
-          this.router.navigate(['/admin/dashboard'])
-        } else {
-          this.snack.open(res.message, 'OK', { duration: 3000 });
-        }
-      },
-      error: (err) => {
-        this.loaderService.hide();
-        console.log(err)
-      }
-    })
+    this.httpService
+      .get('/auth/verify-email', { token })
+      .pipe(
+        finalize(() => {
+          this.loaderService.hide();
+        }),
+      )
+      .subscribe({
+        next: (res: any) => {
+          if (res.success) {
+            this.tokenService.setTokens(res.token.accessToken, res.token.refreshToken);
+            this.router.navigate(['/admin/dashboard']);
+          } else {
+            this.snack.open(res.message, 'OK', { duration: 3000 });
+          }
+        },
+        error: (err) => {
+          console.log(err);
+        },
+      });
   }
 
   ngOnDestroy(): void {

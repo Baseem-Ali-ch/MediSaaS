@@ -39,7 +39,8 @@ export const routes: Routes = [
             { path: 'dashboard', component: DashboardComponent },
             { path: 'profile', loadComponent: () => import('./pages/admin-portal/profile/profile.component').then(m => m.ProfileComponent) },
             { path: 'lab-management', loadComponent: () => import('./pages/admin-portal/configuration/lab-management/lab-management.component').then(m => m.LabManagementComponent) },
-            { path: 'branch-management', loadComponent: () => import('./pages/admin-portal/configuration/branches/branches.component').then(m => m.BranchesComponent) }
+            { path: 'branch-management', loadComponent: () => import('./pages/admin-portal/configuration/branches/branches.component').then(m => m.BranchesComponent) },
+            { path: 'staff-management', loadComponent: () => import('./pages/admin-portal/configuration/staff-management/staff-management.component').then(m => m.StaffManagementComponent) }
         ]
     }
 ];

@@ -7,7 +7,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { ConfirmationPopupComponent } from '../../../../components/popup/confirmation/confirmation.component';
 import { LoaderService } from '../../../../services/loader.service';
 import { HttpService } from '../../../../services/http.service';
+import { ToastService } from '../../../../services/toast.service';
 import { ALL_COUNTRIES, STATES_MAP } from '../../../../constants/location.constants';
+import { finalize } from 'rxjs';
 
 export interface BranchData {
   id: string;
@@ -27,7 +29,7 @@ export interface BranchData {
   standalone: true,
   imports: [CommonModule, FormsModule, MatIconModule, MatDialogModule, MatSelectModule],
   templateUrl: './branches.component.html',
-  styleUrl: './branches.component.css',
+  styleUrls: ['./branches.component.css', '../../../../../assets/styles/form.css'],
 })
 export class BranchesComponent implements OnInit {
   branches: BranchData[] = [];
@@ -36,8 +38,6 @@ export class BranchesComponent implements OnInit {
   isPanelOpen = false;
   editMode = false;
   isSubmitting = false;
-  toastMessage = '';
-  toastIsError = false;
   branchModel: BranchData = this.getEmptyModel();
   originalModel: BranchData = this.getEmptyModel();
   focus: Record<string, boolean> = {};
@@ -50,6 +50,7 @@ export class BranchesComponent implements OnInit {
     private dialog: MatDialog,
     private loaderService: LoaderService,
     private httpService: HttpService,
+    private toastService: ToastService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -59,18 +60,22 @@ export class BranchesComponent implements OnInit {
 
   getBranchList() {
     this.loaderService.show();
-    this.httpService.get('/admin/branch').subscribe({
-      next: (res: any) => {
-        this.branches = [...res.data];
-      },
-      error: (err) => {
-        this.showToast('Failed to fetch branch details.', true);
-      },
-      complete: () => {
-        this.loaderService.hide();
-        this.cdr.detectChanges();
-      },
-    });
+    this.httpService
+      .get('/admin/branch')
+      .pipe(
+        finalize(() => {
+          this.loaderService.hide();
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (res: any) => {
+          this.branches = [...res.data];
+        },
+        error: (err) => {
+          this.toastService.show('Failed to fetch branch details.');
+        },
+      });
   }
 
   getFilteredCountries(): string[] {
@@ -87,7 +92,7 @@ export class BranchesComponent implements OnInit {
   }
 
   onCountryChange() {
-    this.branchModel.state = ''; // reset state when country changes
+    this.branchModel.state = '';
   }
 
   filteredBranches(): BranchData[] {
@@ -186,40 +191,56 @@ export class BranchesComponent implements OnInit {
     this.isSubmitting = true;
 
     if (this.editMode) {
-      this.httpService.patch(`/admin/branch/${this.branchModel.id}`, this.branchModel).subscribe({
-        next: (res: any) => {
-          const idx = this.branches.findIndex((b) => b.id === this.branchModel.id);
-          if (idx !== -1) {
-            this.branches[idx] = { ...this.branchModel };
-            this.showToast('Branch updated successfully', false);
-          }
-        },
-        error: (err: any) => {
-          this.showToast('Failed to update branch', true);
-        },
-        complete: () => {
-          this.isSubmitting = false;
-          this.closePanel();
-          this.cdr.detectChanges();
-        },
-      });
+      this.httpService
+        .patch(`/admin/branch/${this.branchModel.id}`, this.branchModel)
+        .pipe(
+          finalize(() => {
+            this.isSubmitting = false;
+            this.cdr.detectChanges();
+          }),
+        )
+        .subscribe({
+          next: (res: any) => {
+            if (!res.success) {
+              this.toastService.show(res.message || 'Failed to update branch');
+              return;
+            }
+            const idx = this.branches.findIndex((b) => b.id === this.branchModel.id);
+            if (idx !== -1) {
+              this.branches[idx] = { ...this.branchModel };
+              this.toastService.show('Branch updated successfully');
+              this.closePanel();
+            }
+          },
+          error: (err: any) => {
+            this.toastService.show('Failed to update branch');
+          },
+        });
     } else {
-      this.httpService.post('/admin/branch', this.branchModel).subscribe({
-        next: (res: any) => {
-          const newBranch = { ...this.branchModel, ...(res.data || res.branch || {}) };
-          if (!newBranch.id && res.id) newBranch.id = res.id;
-          this.branches.push(newBranch);
-          this.showToast('Branch added successfully', false);
-        },
-        error: (err: any) => {
-          this.showToast('Failed to add branch', true);
-        },
-        complete: () => {
-          this.isSubmitting = false;
-          this.closePanel();
-          this.cdr.detectChanges();
-        },
-      });
+      this.httpService
+        .post('/admin/branch', this.branchModel)
+        .pipe(
+          finalize(() => {
+            this.isSubmitting = false;
+            this.cdr.detectChanges();
+          }),
+        )
+        .subscribe({
+          next: (res: any) => {
+            if (!res.success) {
+              this.toastService.show(res.message || 'Failed to add branch');
+              return;
+            }
+            const newBranch = { ...this.branchModel, ...(res.data || res.branch || {}) };
+            if (!newBranch.id && res.id) newBranch.id = res.id;
+            this.branches.push(newBranch);
+            this.toastService.show('Branch added successfully');
+            this.closePanel();
+          },
+          error: (err: any) => {
+            this.toastService.show('Failed to add branch');
+          },
+        });
     }
   }
 
@@ -237,29 +258,26 @@ export class BranchesComponent implements OnInit {
       },
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.httpService.delete(`/admin/branch/${branch.id}`).subscribe({
-          next: () => {
-            this.branches = this.branches.filter((b) => b.id !== branch.id);
-            this.showToast('Branch deleted successfully', false);
-          },
-          error: (err: any) => {
-            this.showToast('Failed to delete branch', true);
-          },
-          complete: () => {
-            this.cdr.detectChanges();
-          },
-        });
-      }
-    });
-  }
-
-  showToast(msg: string, isError: boolean) {
-    this.toastMessage = msg;
-    this.toastIsError = isError;
-    setTimeout(() => {
-      this.toastMessage = '';
-    }, 3000);
+    dialogRef
+      .afterClosed()
+      .pipe(
+        finalize(() => {
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe((result) => {
+        if (result) {
+          this.httpService.delete(`/admin/branch/${branch.id}`).subscribe({
+            next: () => {
+              this.branches = this.branches.filter((b) => b.id !== branch.id);
+              this.toastService.show('Branch deleted successfully');
+            },
+            error: (err: any) => {
+              this.toastService.show('Failed to delete branch');
+              this.cdr.detectChanges();
+            },
+          });
+        }
+      });
   }
 }

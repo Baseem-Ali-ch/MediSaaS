@@ -54,6 +54,7 @@ export class SidebarComponent implements OnInit {
       children: [
         { label: 'Lab Management', route: '/admin/lab-management' },
         { label: 'Branch Management', route: '/admin/branch-management' },
+        { label: 'Staff Management', route: '/admin/staff-management' },
       ]
     },
   ];

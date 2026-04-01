@@ -16,6 +16,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { HttpService } from '../../../services/http.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -115,24 +116,27 @@ export class RegisterPage implements OnInit {
   onSubmit(): void {
     if (this.registerForm.valid) {
       this.isLoading = true;
-      this.httpService.post('/auth/register-lab', this.registerForm.value).subscribe({
-        next: (res: any) => {
-          if (res.success) {
-            this.router.navigate(['/auth/verify-email']);
-          } else {
+      this.httpService
+        .post('/auth/register-lab', this.registerForm.value)
+        .pipe(
+          finalize(() => {
             this.isLoading = false;
-            this.snack.open(res.message, 'OK', { duration: 3000 });
-          }
-        },
-        error: (err) => {
-          console.log(err);
-          this.snack.open('Failed to register', 'OK', { duration: 3000 });
-        },
-        complete: () => {
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        },
-      });
+            this.cdr.detectChanges();
+          }),
+        )
+        .subscribe({
+          next: (res: any) => {
+            if (res.success) {
+              this.router.navigate(['/auth/verify-email']);
+            } else {
+              this.snack.open(res.message, 'OK', { duration: 3000 });
+            }
+          },
+          error: (err) => {
+            console.log(err);
+            this.snack.open('Failed to register', 'OK', { duration: 3000 });
+          },
+        });
     } else {
       this.markFormGroupTouched(this.registerForm);
     }

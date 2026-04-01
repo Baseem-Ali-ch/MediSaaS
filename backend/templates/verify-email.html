@@ -1,33 +1,259 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Email Verification</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: #f2faf4;
+        font-family: "DM Sans", sans-serif;
+        padding: 40px 16px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .email-wrapper {
+        max-width: 520px;
+        margin: 0 auto;
+      }
+
+      /* ── Header Bar ── */
+      .header {
+        background: #1a7a3c;
+        border-radius: 8px 8px 0 0;
+        padding: 28px 36px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 160px;
+        height: 160px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+      }
+
+      .header::after {
+        content: "";
+        position: absolute;
+        bottom: -60px;
+        right: 40px;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 50%;
+      }
+
+      .header-icon {
+        width: 36px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .header-icon svg {
+        width: 18px;
+        height: 18px;
+        stroke: #ffffff;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .header-text {
+        flex: 1;
+      }
+
+      .header-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 2px;
+      }
+
+      .header-title {
+        font-size: 17px;
+        font-weight: 600;
+        color: #ffffff;
+        letter-spacing: -0.01em;
+      }
+
+      /* ── Card Body ── */
+      .card {
+        background: #ffffff;
+        border: 1px solid #d4edda;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        padding: 36px;
+        box-shadow:
+          0 10px 15px -3px rgba(26, 122, 60, 0.08),
+          0 4px 6px -4px rgba(26, 122, 60, 0.04);
+      }
+
+      .greeting {
+        font-size: 14px;
+        color: #0d2b17;
+        font-weight: 500;
+        margin-bottom: 10px;
+      }
+
+      .body-text {
+        font-size: 13.5px;
+        color: #2e6644;
+        line-height: 1.65;
+        margin-bottom: 28px;
+      }
+
+      /* ── CTA Button ── */
+      .cta-wrap {
+        margin-bottom: 28px;
+        text-align: center;
+      }
+
+      .cta-btn {
+        display: inline-block;
+        background: #1a7a3c;
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 13.5px;
+        font-weight: 600;
+        padding: 13px 32px;
+        border-radius: 6px;
+        letter-spacing: 0.01em;
+      }
+
+      /* ── Notice ── */
+      .notice {
+        background: #f2faf4;
+        border-left: 3px solid #2e9e6b;
+        border-radius: 0 6px 6px 0;
+        padding: 12px 14px;
+        margin-bottom: 28px;
+      }
+
+      .notice p {
+        font-size: 12.5px;
+        color: #2e6644;
+        line-height: 1.55;
+      }
+
+      .notice p strong {
+        color: #0d2b17;
+        font-weight: 600;
+      }
+
+      /* ── Footer ── */
+      .footer {
+        padding-top: 20px;
+        border-top: 1px solid #d4edda;
+      }
+
+      .footer-sig {
+        font-size: 13px;
+        color: #2e6644;
+        line-height: 1.6;
+        margin-bottom: 16px;
+      }
+
+      .footer-sig strong {
+        color: #0d2b17;
+        font-weight: 600;
+      }
+
+      .footer-note {
+        font-size: 11.5px;
+        color: #2e6644;
+        opacity: 0.65;
+        line-height: 1.5;
+      }
+
+      /* ── Below card ── */
+      .below-card {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 11px;
+        color: #2e6644;
+        opacity: 0.55;
+        letter-spacing: 0.01em;
+      }
+    </style>
   </head>
   <body>
-    <div
-      style="
-        font-family: Arial, sans-serif;
-        line-height: 1.6;
-        color: #333;
-        max-width: 500px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-      "
-    >
-      <h2 style="text-align: center; color: #4caf50">🔒 Email Verification</h2>
-      <p>Hello,</p>
-      <p>Your One-Time Password (OTP) for verification is:</p>
-      <p>
-        This OTP is valid for <strong>1 minute</strong>. Please do not share it
-        with anyone.
-      </p>
-      <a href="{{VERIFY_URL}}">Verify Email</a>
-      <p>If you did not request this verification, please ignore this email.</p>
-      <p>Best regards,<br /><strong>Your Security Team</strong></p>
+    <div class="email-wrapper">
+      <!-- Header -->
+      <div class="header">
+        <div class="header-icon">
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+        </div>
+        <div class="header-text">
+          <div class="header-label">Security Alert</div>
+          <div class="header-title">Email Verification</div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="card">
+        <p class="greeting">Hello,</p>
+        <p class="body-text">
+          We received a request to verify your email address. Click the button
+          below to confirm your identity and activate your account.
+        </p>
+
+        <!-- CTA -->
+        <div class="cta-wrap">
+          <a href="{{VERIFY_URL}}" class="cta-btn">Verify My Email →</a>
+        </div>
+
+        <!-- Notice -->
+        <div class="notice">
+          <p>
+            This link is valid for <strong>1 minute</strong>. If you didn't
+            request this verification, you can safely ignore this email — no
+            changes will be made to your account.
+          </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+          <p class="footer-sig">
+            Best regards,<br />
+            <strong>Your Security Team</strong>
+          </p>
+          <p class="footer-note">
+            This is an automated message. Please do not reply directly to this
+            email.
+          </p>
+        </div>
+      </div>
+
+      <p class="below-card">© 2026 · All rights reserved</p>
     </div>
   </body>
 </html>

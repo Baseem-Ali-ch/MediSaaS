@@ -168,40 +168,58 @@ html.dark .icon-btn:hover {
 .profile-select-container {
   display: flex;
   align-items: center;
+}
+
+.profile-menu-button {
+  display: flex;
+  align-items: center;
   background: transparent;
-  padding: 4px 6px;
-  border-radius: var(--radius-button);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
   transition: var(--transition-fast);
+  gap: 8px;
+}
+
+.profile-menu-button:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+html.dark .profile-menu-button:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .profile-avatar-icon {
+  color: var(--primary);
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  line-height: 28px;
+}
+
+.profile-name-trigger {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.dropdown-arrow {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
   color: var(--text-secondary);
-  font-size: 24px;
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
-  margin-right: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  transition: transform 0.2s ease;
 }
 
-.profile-select-container .mat-mdc-select {
-  width: 120px;
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-primary);
+.profile-menu-button[aria-expanded="true"] .dropdown-arrow {
+  transform: rotate(180deg);
 }
 
-.profile-select-container .mat-mdc-select-trigger {
-  color: var(--text-primary);
-}
-
-.profile-select-container>.mat-mdc-select-value {
-  color: var(--text-primary);
-  font-weight: 600;
+.menu-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 6px 0;
 }
 
 /* Dropdown Overlay Animation Linear Style */
@@ -227,19 +245,21 @@ html.dark .icon-btn:hover {
   transform-origin: top right;
 }
 
-.profile-select-panel .mat-mdc-option {
+.profile-select-panel .mat-mdc-menu-item {
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--text-primary) !important;
   transition: var(--transition-fast);
+  padding: 8px 16px;
+  min-height: 40px;
 }
 
-.profile-select-panel .mat-mdc-option:hover {
+.profile-select-panel .mat-mdc-menu-item:hover {
   background-color: var(--bg-main) !important;
 }
 
-.profile-select-panel .mat-mdc-option .mat-icon {
-  margin-right: 8px;
+.profile-select-panel .mat-mdc-menu-item .mat-icon {
+  margin-right: 12px;
   color: var(--text-secondary);
   font-size: 20px;
   width: 20px;
@@ -247,12 +267,11 @@ html.dark .icon-btn:hover {
 }
 
 .profile-select-panel .logout-option {
-  border-top: 1px solid var(--border);
-  color: var(--danger) !important;
+  color: #ef4444 !important;
 }
 
 .profile-select-panel .logout-option .mat-icon {
-  color: var(--danger);
+  color: #ef4444 !important;
 }
 
 /* Hard-code Dark Theme for Overlay Container (Since it operates outside shadow DOM/encapsulation) */
@@ -261,20 +280,19 @@ html.dark .profile-select-panel {
   border-color: #163d22 !important;
 }
 
-html.dark .profile-select-panel .mat-mdc-option {
+html.dark .profile-select-panel .mat-mdc-menu-item {
   color: #d4f0dc !important;
 }
 
-html.dark .profile-select-panel .mat-mdc-option:hover {
-  background-color: #081a10 !important;
+html.dark .profile-select-panel .mat-mdc-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
 }
 
-html.dark .profile-select-panel .mat-mdc-option .mat-icon {
+html.dark .profile-select-panel .mat-mdc-menu-item .mat-icon {
   color: #7abf94 !important;
 }
 
 html.dark .profile-select-panel .logout-option {
-  border-top-color: #163d22;
   color: #ef4444 !important;
 }
 

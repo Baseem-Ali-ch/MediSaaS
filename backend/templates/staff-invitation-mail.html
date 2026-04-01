@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Staff Invitation</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: #f2faf4;
+        font-family: "DM Sans", sans-serif;
+        padding: 40px 16px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .email-wrapper {
+        max-width: 520px;
+        margin: 0 auto;
+      }
+
+      /* ── Header ── */
+      .header {
+        background: #1a7a3c;
+        border-radius: 8px 8px 0 0;
+        padding: 32px 36px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 180px;
+        height: 180px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+      }
+      .header::after {
+        content: "";
+        position: absolute;
+        bottom: -70px;
+        right: 50px;
+        width: 120px;
+        height: 120px;
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 50%;
+      }
+
+      .header-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .header-icon {
+        width: 36px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .header-icon svg {
+        width: 18px;
+        height: 18px;
+        stroke: #fff;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .header-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.6);
+        margin-bottom: 2px;
+      }
+
+      .header-title {
+        font-size: 17px;
+        font-weight: 600;
+        color: #fff;
+        letter-spacing: -0.01em;
+      }
+
+      .header-greeting {
+        font-size: 22px;
+        font-weight: 600;
+        color: #fff;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+        margin-bottom: 6px;
+        position: relative;
+      }
+
+      .header-sub {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.65);
+        line-height: 1.5;
+        position: relative;
+      }
+
+      /* ── Card ── */
+      .card {
+        background: #ffffff;
+        border: 1px solid #d4edda;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        padding: 36px;
+        box-shadow:
+          0 10px 15px -3px rgba(26, 122, 60, 0.08),
+          0 4px 6px -4px rgba(26, 122, 60, 0.04);
+      }
+
+      .body-text {
+        font-size: 13.5px;
+        color: #2e6644;
+        line-height: 1.7;
+        margin-bottom: 28px;
+      }
+
+      /* ── Credentials Block ── */
+      .credentials {
+        background: #f2faf4;
+        border: 1.5px solid #d4edda;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 28px;
+      }
+
+      .credentials-header {
+        background: #1a7a3c;
+        padding: 10px 16px;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.85);
+      }
+
+      .credentials-body {
+        padding: 4px 0;
+      }
+
+      .cred-row {
+        display: flex;
+        align-items: center;
+        padding: 13px 16px;
+        gap: 12px;
+        border-bottom: 1px solid #d4edda;
+      }
+
+      .cred-row:last-child {
+        border-bottom: none;
+      }
+
+      .cred-icon {
+        width: 30px;
+        height: 30px;
+        background: #fff;
+        border: 1px solid #d4edda;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .cred-icon svg {
+        width: 14px;
+        height: 14px;
+        stroke: #1a7a3c;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .cred-info {
+        flex: 1;
+      }
+
+      .cred-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #2e6644;
+        opacity: 0.7;
+        margin-bottom: 2px;
+      }
+
+      .cred-value {
+        font-family: "DM Mono", monospace;
+        font-size: 13.5px;
+        font-weight: 500;
+        color: #0d2b17;
+        letter-spacing: 0.02em;
+      }
+
+      /* ── Temp password warning ── */
+      .temp-notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 6px;
+        padding: 12px 14px;
+        margin-bottom: 28px;
+      }
+
+      .temp-notice-icon {
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+
+      .temp-notice-icon svg {
+        width: 15px;
+        height: 15px;
+        stroke: #ca8a04;
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .temp-notice p {
+        font-size: 12.5px;
+        color: #92400e;
+        line-height: 1.55;
+      }
+
+      .temp-notice p strong {
+        color: #78350f;
+        font-weight: 600;
+      }
+
+      /* ── CTA ── */
+      .cta-wrap {
+        margin-bottom: 28px;
+        text-align: center;
+      }
+
+      .cta-btn {
+        display: inline-block;
+        background: #1a7a3c;
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 13.5px;
+        font-weight: 600;
+        padding: 13px 36px;
+        border-radius: 6px;
+        letter-spacing: 0.01em;
+      }
+
+      .cta-hint {
+        margin-top: 10px;
+        font-size: 11.5px;
+        color: #2e6644;
+        opacity: 0.6;
+        text-align: center;
+      }
+
+      /* ── Footer ── */
+      .footer {
+        padding-top: 20px;
+        border-top: 1px solid #d4edda;
+      }
+
+      .footer-sig {
+        font-size: 13px;
+        color: #2e6644;
+        line-height: 1.6;
+        margin-bottom: 14px;
+      }
+
+      .footer-sig strong {
+        color: #0d2b17;
+        font-weight: 600;
+      }
+
+      .footer-note {
+        font-size: 11.5px;
+        color: #2e6644;
+        opacity: 0.55;
+        line-height: 1.55;
+      }
+
+      .below-card {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 11px;
+        color: #2e6644;
+        opacity: 0.45;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-wrapper">
+      <!-- Header -->
+      <div class="header">
+        <div class="header-top">
+          <div class="header-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <line x1="19" y1="8" x2="19" y2="14" />
+              <line x1="22" y1="11" x2="16" y2="11" />
+            </svg>
+          </div>
+          <div>
+            <div class="header-label">Staff Invitation</div>
+            <div class="header-title">You've been added to the team</div>
+          </div>
+        </div>
+        <div class="header-greeting">Welcome aboard, {{STAFF_NAME}} 👋</div>
+        <div class="header-sub">
+          An administrator has created an account for you. Your login
+          credentials are below.
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="card">
+        <p class="body-text">
+          You have been granted access to the system. Use the credentials below
+          to sign in for the first time. Once logged in, you'll be prompted to
+          set a new password.
+        </p>
+
+        <!-- Credentials -->
+        <div class="credentials">
+          <div class="credentials-header">Your Login Credentials</div>
+          <div class="credentials-body">
+            <div class="cred-row">
+              <div class="cred-icon">
+                <svg viewBox="0 0 24 24">
+                  <path
+                    d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                  />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+              </div>
+              <div class="cred-info">
+                <div class="cred-label">Email Address</div>
+                <div class="cred-value">{{STAFF_EMAIL}}</div>
+              </div>
+            </div>
+
+            <div class="cred-row">
+              <div class="cred-icon">
+                <svg viewBox="0 0 24 24">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </div>
+              <div class="cred-info">
+                <div class="cred-label">Temporary Password</div>
+                <div class="cred-value">{{TEMP_PASSWORD}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Temp password warning -->
+        <div class="temp-notice">
+          <div class="temp-notice-icon">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+              />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </div>
+          <p>
+            <strong>This is a temporary password.</strong> For your security,
+            you will be asked to change it immediately after your first login.
+            Do not share it with anyone.
+          </p>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-wrap">
+          <a href="{{INVITE_URL}}" class="cta-btn"
+            >Accept Invitation & Sign In →</a
+          >
+          <p class="cta-hint">This invitation link expires in 24 hours.</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+          <p class="footer-sig">
+            Welcome to the team,<br />
+            <strong>Your Administrator</strong>
+          </p>
+          <p class="footer-note">
+            If you weren't expecting this invitation or believe this was sent in
+            error, please disregard this email. No action will be taken without
+            your consent.
+          </p>
+        </div>
+      </div>
+
+      <p class="below-card">© 2026 · All rights reserved</p>
+    </div>
+  </body>
+</html>

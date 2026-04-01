@@ -79,6 +79,10 @@ export const login = async (data: { email: string; password: string }) => {
     throw new Error("Invalid email or password");
   }
 
+  if(!user.emailVerified){
+    throw new Error("Please verify your email address before logging in");
+  }
+
   const isMatch = await comparePassword(data.password, user.password);
   if (!isMatch) {
     throw new Error("Invalid email or password");

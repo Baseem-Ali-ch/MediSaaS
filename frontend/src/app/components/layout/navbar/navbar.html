@@ -52,24 +52,25 @@
 
         <div class="header-divider"></div>
 
-        <!-- Profile Dropdown (using mat-select as requested) -->
+        <!-- Profile Menu Button -->
         <div class="profile-select-container">
-            <mat-icon class="profile-avatar-icon">account_circle</mat-icon>
-            <mat-select panelClass="profile-select-panel" [value]="selectedProfileOption"
-                (selectionChange)="onProfileOptionChange($event.value)" placeholder="Dr. Admin">
-                <mat-select-trigger>
-                    <span class="profile-name-trigger">Dr. Admin</span>
-                </mat-select-trigger>
-                <mat-option value="profile">
+            <button class="profile-menu-button" [matMenuTriggerFor]="profileMenu">
+                <mat-icon class="profile-avatar-icon">account_circle</mat-icon>
+                <span class="profile-name-trigger">Dr. Admin</span>
+                <mat-icon class="dropdown-arrow">expand_more</mat-icon>
+            </button>
+            <mat-menu #profileMenu="matMenu" class="profile-select-panel" xPosition="before">
+                <button mat-menu-item (click)="onProfileOptionChange('profile')">
                     <mat-icon>person</mat-icon> Profile
-                </mat-option>
-                <mat-option value="settings">
+                </button>
+                <button mat-menu-item (click)="onProfileOptionChange('settings')">
                     <mat-icon>settings</mat-icon> Settings
-                </mat-option>
-                <mat-option value="logout" class="logout-option">
+                </button>
+                <div class="menu-divider"></div>
+                <button mat-menu-item class="logout-option" (click)="logout()">
                     <mat-icon>logout</mat-icon> Logout
-                </mat-option>
-            </mat-select>
+                </button>
+            </mat-menu>
         </div>
     </div>
 </header>

@@ -4,6 +4,7 @@
 :root {
   /* Medical Green — Light Mode (Kept EXACTLY as-is) */
   --bg-main: #f2faf4;
+  --bg-main-rgb: 242, 250, 244;
   /* faint surgical green tint */
   --bg-card: #ffffff;
   --border: #d4edda;
@@ -50,6 +51,7 @@
 
 html.dark {
   --bg-main: #081a10;
+  --bg-main-rgb: 8, 26, 16;
   /* deep surgical green-black */
   --bg-card: #0f2e1a;
   --border: #163d22;

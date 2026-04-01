@@ -21,7 +21,7 @@ import { ToastService } from '../../services/toast.service';
       bottom: 40px;
       left: 50%;
       transform: translateX(-50%) translateY(100px);
-      z-index: 10000;
+      z-index: 200000;
       opacity: 0;
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       pointer-events: none;
