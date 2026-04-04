@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { authenticate } from "../middlewares/authenticate";
-import * as profileController from "../controllers/admin/profile.controller";
-import * as labController from "../controllers/admin/lab.controller";
-import * as branchController from "../controllers/admin/branch.controller";
+import * as profileController from "../controllers/owner/profile.controller";
+import * as labController from "../controllers/owner/lab.controller";
+import * as branchController from "../controllers/owner/branch.controller";
+import * as staffController from '../controllers/owner/staff.controller'
 
 const router = Router()
 
@@ -19,6 +20,11 @@ router.patch('/lab/:id', labController.updateLab)
 router.get('/branch', branchController.getBranch)
 router.post('/branch', branchController.createBranch)
 router.patch('/branch/:id', branchController.udpateBranch)
-router.delete('/branch/:id', branchController.deleteBranch)
+router.delete('/branch/:id', branchController.deleteBranch) 
+
+router.get("/staff", staffController.getStaff);
+router.post("/staff", staffController.createStaff);
+router.put("/staff/:id", staffController.updateStaff);
+router.delete("/staff/:id", staffController.deleteStaff);
 
 export default router

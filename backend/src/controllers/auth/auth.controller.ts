@@ -22,18 +22,24 @@ export const registerLab = async (
   }
 };
 
-export const login = async(req: Request, res: Response, next: NextFunction) => {
+export const login = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
+    const ipAddress =
+      req.ip ?? (req.headers["x-forwarded-for"] as string) ?? null;
     const dto = new authDto.LoginDTO(req.body);
     const data = authMap.MapLogin(dto);
-    const result = await authService.login(data);
+    const result = await authService.login(data, ipAddress);
     res.status(200).json({
       success: true,
       message: "Login successful",
       token: {
         accessToken: result.accessToken,
         refreshToken: result.refreshToken,
-        user: result.user
+        user: result.user,
       },
     });
   } catch (error) {
@@ -41,7 +47,6 @@ export const login = async(req: Request, res: Response, next: NextFunction) => {
     next(error);
   }
 };
-
 
 export const verifyEmail = async (
   req: Request,

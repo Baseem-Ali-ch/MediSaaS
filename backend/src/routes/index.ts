@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import authRoutes from './auth.routes'
-import adminRoutes from './admin.routes'
+import adminRoutes from './owner.routes'
 
 const router = Router()
 

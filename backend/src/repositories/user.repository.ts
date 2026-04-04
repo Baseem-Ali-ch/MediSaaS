@@ -51,4 +51,26 @@ export class UserRepository extends BaseRepository<
       },
     });
   }
+
+  getStaff = async (labId: number) => {
+    return this.prisma.user.findMany({
+      where: {
+        labId,
+        role: { notIn: ["OWNER", "SUPER_ADMIN"] },
+        status: { not: "SUSPENDED" },
+      },
+      include: { lab: true, branch: true },
+      orderBy: { createdAt: "desc" },
+    });
+  };
+
+  findStaffById = async (id: number) => {
+    return this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        lab: true,
+        branch: true,
+      },
+    });
+  };
 }

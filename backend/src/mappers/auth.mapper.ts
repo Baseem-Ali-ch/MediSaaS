@@ -1,8 +1,8 @@
 import e from "express";
-import * as authDto from "../dtos/auth.dto";
+import * as ownerDto from "../dtos/auth.dto";
 import { RegisterLabData } from "../types/auth.type";
 
-export function MapRegisterLab(dto: authDto.RegisterLabDTO): RegisterLabData {
+export function MapRegisterLab(dto: ownerDto.RegisterLabDTO): RegisterLabData {
   return {
     // Section 1
     labName: dto.labName,
@@ -32,40 +32,40 @@ export function MapRegisterLab(dto: authDto.RegisterLabDTO): RegisterLabData {
   };
 }
 
-export function MapLogin(dto: authDto.LoginDTO) {
+export function MapLogin(dto: ownerDto.LoginDTO) {
   return {
     email: dto.email,
     password: dto.password,
   };
 }
 
-export function MapVerifyEmail(dto: authDto.VerifyEmailDTO) {
+export function MapVerifyEmail(dto: ownerDto.VerifyEmailDTO) {
   return {
     token: dto.token,
   };
 }
 
-export function MapRefreshToken(dto: authDto.RefreshTokenDTO) {
+export function MapRefreshToken(dto: ownerDto.RefreshTokenDTO) {
   return {
     refreshToken: dto.refreshToken,
   };
 }
 
 export function MapResendEmailVerification(
-  dto: authDto.ResendEmailVerificationDTO,
+  dto: ownerDto.ResendEmailVerificationDTO,
 ) {
   return {
     email: dto.email,
   };
 }
 
-export function MapForgotPassword(dto: authDto.ForgotPasswordDTO) {
+export function MapForgotPassword(dto: ownerDto.ForgotPasswordDTO) {
   return {
     email: dto.email,
   };
 }
 
-export function MapResetPassword(dto: authDto.ResetPasswordDTO) {
+export function MapResetPassword(dto: ownerDto.ResetPasswordDTO) {
   return {
     password: dto.newPassword,
     resetToken: dto.token,

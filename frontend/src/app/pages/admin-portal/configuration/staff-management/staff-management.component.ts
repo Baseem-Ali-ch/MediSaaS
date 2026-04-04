@@ -14,6 +14,7 @@ import { ConfirmationPopupComponent } from '../../../../components/popup/confirm
 import { LoaderService } from '../../../../services/loader.service';
 import { HttpService } from '../../../../services/http.service';
 import { ToastService } from '../../../../services/toast.service';
+import { finalize } from 'rxjs';
 
 export interface StaffData {
   id: string;
@@ -53,27 +54,25 @@ export interface StaffData {
 export class StaffManagementComponent implements OnInit {
   staffList: StaffData[] = [];
   displayedColumns: string[] = ['staffId', 'name', 'phone', 'role', 'branch', 'email', 'actions'];
-
-  // Table sorting & pagination
   @ViewChild(MatSort) sort!: MatSort;
   searchQuery: string = '';
   filterRole: string = 'All';
-
   currentPage: number = 1;
   pageSize: number = 10;
   totalFilteredItems: number = 0;
-
-  // Panel State
   isPanelOpen = false;
   editMode = false;
   isSubmitting = false;
   staffModel: StaffData = this.getEmptyModel();
   originalModel: StaffData = this.getEmptyModel();
   focus: Record<string, boolean> = {};
-
-  // Roles & Branches
-  roles = ['Admin', 'Doctor', 'Reception', 'Lab Technician'];
-  branches = ['Main Branch', 'City Center', 'Suburban Lab'];
+  branches: any[] = [];
+  roles = [
+    { label: 'staff', key: 'STAFF' },
+    { label: 'Reception', key: 'RECEPTIONIST' },
+    { label: 'Lab Technician', key: 'TECHNICIAN' },
+    { label: 'Branch Manager', key: 'BRANCH_MANAGER' },
+  ];
 
   constructor(
     private dialog: MatDialog,
@@ -85,76 +84,46 @@ export class StaffManagementComponent implements OnInit {
 
   ngOnInit() {
     this.getStaffList();
+    this.getBranchList();
   }
 
   getStaffList() {
     this.loaderService.show();
-    // Simulate or call real API
-    // this.httpService.get('/admin/staff').subscribe(...)
+    this.httpService
+      .get('/admin/staff')
+      .pipe(
+        finalize(() => {
+          this.loaderService.hide();
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (res: any) => {
+          this.staffList = [...res.data];
+        },
+        error: (err) => {
+          this.toastService.show('Failed to fetch staff details.');
+        },
+      });
+  }
 
-    // Mock Data
-    setTimeout(() => {
-      this.staffList = [
-        {
-          id: '1',
-          staffId: 'STF-001',
-          name: 'John Doe',
-          email: 'john@example.com',
-          phone: '1234567890',
-          role: 'Doctor',
-          branch: 'Main Branch',
-          gender: 'Male',
-          status: 'Active',
+  getBranchList() {
+    this.httpService
+      .get('/admin/branch')
+      .pipe(
+        finalize(() => {
+          this.loaderService.hide();
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (res: any) => {
+          this.branches = [...res.data];
         },
-        {
-          id: '2',
-          staffId: 'STF-002',
-          name: 'Jane Smith',
-          email: 'jane@example.com',
-          phone: '0987654321',
-          role: 'Admin',
-          branch: 'City Center',
-          gender: 'Female',
-          status: 'Active',
+        error: (err) => {
+          this.toastService.show('Failed to fetch branch details.');
         },
-        {
-          id: '3',
-          staffId: 'STF-003',
-          name: 'Mark Wilson',
-          email: 'mark@example.com',
-          phone: '5554443332',
-          role: 'Reception',
-          branch: 'Main Branch',
-          gender: 'Male',
-          status: 'Active',
-        },
-        {
-          id: '4',
-          staffId: 'STF-004',
-          name: 'Sarah Parker',
-          email: 'sarah@example.com',
-          phone: '1112223334',
-          role: 'Lab Technician',
-          branch: 'Suburban Lab',
-          gender: 'Female',
-          status: 'Active',
-        },
-        {
-          id: '5',
-          staffId: 'STF-005',
-          name: 'Alex Johnson',
-          email: 'alex@example.com',
-          phone: '4445556667',
-          role: 'Doctor',
-          branch: 'City Center',
-          gender: 'Other',
-          status: 'Inactive',
-        },
-      ];
-      this.updateTotalCount();
-      this.loaderService.hide();
-      this.cdr.detectChanges();
-    }, 500);
+      });
   }
 
   getFilteredStaff(): StaffData[] {
@@ -176,7 +145,6 @@ export class StaffManagementComponent implements OnInit {
 
     this.totalFilteredItems = result.length;
 
-    // Manual pagination for mock data
     const start = (this.currentPage - 1) * this.pageSize;
     return result.slice(start, start + this.pageSize);
   }
@@ -247,40 +215,87 @@ export class StaffManagementComponent implements OnInit {
       },
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.staffList = this.staffList.filter((s) => s.id !== staff.id);
-        this.toastService.show('Staff member deleted successfully');
-        this.cdr.detectChanges();
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(
+        finalize(() => {
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe((result) => {
+        if (result) {
+          this.httpService.delete(`/admin/branch/${staff.id}`).subscribe({
+            next: () => {
+              this.staffList = this.staffList.filter((b) => b.id !== staff.id);
+              this.toastService.show('Staff deleted successfully');
+            },
+            error: (err: any) => {
+              this.toastService.show('Failed to delete staff');
+            },
+          });
+        }
+      });
   }
 
   saveStaff() {
     if (!this.formValid()) return;
     this.isSubmitting = true;
 
-    // Simulate API call
-    setTimeout(() => {
-      if (this.editMode) {
-        const idx = this.staffList.findIndex((s) => s.id === this.staffModel.id);
-        if (idx !== -1) {
-          this.staffList[idx] = { ...this.staffModel };
-          this.toastService.show('Staff updated successfully');
-        }
-      } else {
-        const newStaff = {
-          ...this.staffModel,
-          id: Date.now().toString(),
-          staffId: 'STF-' + Math.floor(100 + Math.random() * 900),
-        };
-        this.staffList.push(newStaff);
-        this.toastService.show('Staff added successfully');
-      }
-      this.isSubmitting = false;
-      this.isPanelOpen = false;
-      this.cdr.detectChanges();
-    }, 1000);
+    if (this.editMode) {
+      this.httpService
+        .patch(`/admin/staff/${this.staffModel.id}`, this.staffModel)
+        .pipe(
+          finalize(() => {
+            this.isSubmitting = false;
+            this.cdr.detectChanges();
+          }),
+        )
+        .subscribe({
+          next: (res: any) => {
+            if (!res.success) {
+              this.toastService.show(res.message || 'Failed to update staff');
+              return;
+            }
+            const idx = this.staffList.findIndex((s) => s.id === this.staffModel.id);
+            if (idx !== -1) {
+              this.staffList[idx] = { ...this.staffModel };
+              this.toastService.show('Staff updated successfully');
+              this.closePanel();
+            }
+          },
+          error: (err: any) => {
+            this.toastService.show('Failed to update staff');
+          },
+        });
+    } else {
+      this.httpService
+        .post('/admin/staff', this.staffModel)
+        .pipe(
+          finalize(() => {
+            this.isSubmitting = false;
+            this.cdr.detectChanges();
+          }),
+        )
+        .subscribe({
+          next: (res: any) => {
+            if (!res.success) {
+              this.toastService.show(res.message || 'Failed to add staff');
+              return;
+            }
+            const newStaff = { ...this.staffModel, ...(res.data || {}) };
+            if (!newStaff.id && res.id) newStaff.id = res.id;
+            this.staffList.push(newStaff);
+            this.toastService.show('Staff added successfully');
+            this.closePanel();
+          },
+          error: (err: any) => {
+            this.toastService.show('Failed to add staff');
+          },
+        });
+    }
+    this.isSubmitting = false;
+    this.isPanelOpen = false;
+    this.cdr.detectChanges();
   }
 
   onPhotoSelected(event: any) {

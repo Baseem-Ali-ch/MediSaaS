@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import * as profileService from "../../services/admin/profile.service";
+import * as profileService from "../../services/owner/profile.service";
 import logger from "../../config/logger";
-import * as adminDto from "../../dtos/admin.dto";
-import * as adminMap from "../../mappers/admin.mapper";
+import * as adminDto from "../../dtos/owner.dto";
+import * as adminMap from "../../mappers/owner.mapper";
 
 export const getProfile = async (
   req: any,
@@ -10,7 +10,7 @@ export const getProfile = async (
   next: NextFunction,
 ) => {
   try {
-    const userId = req.user?.userId;
+    const userId = req.user?.id;
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
@@ -33,7 +33,7 @@ export const udpateProfile = async (
   next: NextFunction,
 ) => {
   try {
-    const userId = req.user?.userId;
+    const userId = req.user?.id;
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
@@ -59,7 +59,7 @@ export const changePassword = async (
   next: NextFunction
 ) => {
   try{
-    const userId = req.user?.userId;
+    const userId = req.user?.id;
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }

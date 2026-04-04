@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import logger from "../../config/logger";
-import * as labService from "../../services/admin/lab.service";
-import * as adminDto from "../../dtos/admin.dto";
-import * as adminMap from "../../mappers/admin.mapper";
+import * as labService from "../../services/owner/lab.service";
+import * as adminDto from "../../dtos/owner.dto";
+import * as adminMap from "../../mappers/owner.mapper";
 
 export const getLab = async (req: any, res: Response) => {
   try {
-    const userId = req.user?.userId;
+    const userId = req.user?.id;
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
@@ -29,7 +29,7 @@ export const updateLab = async (
   next: NextFunction,
 ) => {
   try {
-    const userId = req.user?.userId;
+    const userId = req.user?.id;
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }

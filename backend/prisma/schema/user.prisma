@@ -1,13 +1,19 @@
 model User {
   id                       Int       @id @default(autoincrement())
+  refId                    String?
   name                     String
   email                    String    @unique
   phone                    String
+  role                     String // OWNER, STAFF, BRANCH_MANAGER, TECHNICIAN, RECEPTIONIST, SUPER_ADMIN
+  gender                   String? // MALE, FEMALE, OTHER
+  photo                    String?
+  status                   String?   @default("ACTIVE") // ACTIVE, INACTIVE, INVITED, SUSPENDED
   password                 String
-  role                     String
   emailVerified            Boolean   @default(false)
   emailVerificationToken   String?
   emailVerificationExpires DateTime?
+  inviteToken              String?
+  inviteTokenExpires       DateTime?
   jwtToken                 String?
   jwtTokenExpires          DateTime?
   createdAt                DateTime  @default(now())
@@ -18,4 +24,6 @@ model User {
 
   branchId Int?
   branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  activityLogs ActivityLog[]
 }

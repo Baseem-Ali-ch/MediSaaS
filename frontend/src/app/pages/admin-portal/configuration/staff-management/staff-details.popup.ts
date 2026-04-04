@@ -25,7 +25,7 @@ import { MatDividerModule } from '@angular/material/divider';
           </div>
           <div class="header-info">
             <h2 class="staff-title">{{ staff.name }}</h2>
-            <p class="staff-id-badge">ID: {{ staff.staffId }}</p>
+            <p class="staff-id-badge">ID: {{ staff.refId }}</p>
           </div>
         </div>
         <button mat-icon-button (click)="close()" class="close-btn">
@@ -55,7 +55,7 @@ import { MatDividerModule } from '@angular/material/divider';
             </div>
             <div class="detail-item">
               <label>Branch</label>
-              <p>{{ staff.branch }}</p>
+              <p>{{ staff.branch.name }}</p>
             </div>
             <div class="detail-item">
               <label>Gender</label>

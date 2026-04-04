@@ -32,17 +32,17 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             req.clone({
               setHeaders: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${res.token.accessToken}`,
+                Authorization: `Bearer ${tokenService.getAccessToken()}`,
               },
-            })
+            }),
           );
         }),
         catchError((refreshErr) => {
           tokenService.clearTokens();
           router.navigate(['/auth/login']);
           return throwError(() => refreshErr);
-        })
+        }),
       );
-    })
+    }),
   );
 };

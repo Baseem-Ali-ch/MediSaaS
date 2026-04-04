@@ -7,6 +7,7 @@ import { ConfirmationPopupComponent } from '../../../components/popup/confirmati
 import { HttpService } from '../../../services/http.service';
 import { LoaderService } from '../../../services/loader.service';
 import { ToastService } from '../../../services/toast.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -68,19 +69,23 @@ export class ProfileComponent implements OnInit {
 
   getProfileData() {
     this.loaderService.show();
-    this.httpService.get('/admin/profile').subscribe({
-      next: (res: any) => {
-        this.originalModel = { ...res.user };
-        this.formModel = { ...res.user };
-      },
-      error: (err) => {
-        this.showToast('Failed to fetch details.');
-      },
-      complete: () => {
-        this.loaderService.hide();
-        this.cdr.detectChanges();
-      },
-    });
+    this.httpService
+      .get('/admin/profile')
+      .pipe(
+        finalize(() => {
+          this.loaderService.hide();
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (res: any) => {
+          this.originalModel = { ...res.user };
+          this.formModel = { ...res.user };
+        },
+        error: (err) => {
+          this.showToast('Failed to fetch details.');
+        },
+      });
   }
   setFocus(field: string) {
     this.focusState[field] = true;
@@ -172,18 +177,23 @@ export class ProfileComponent implements OnInit {
     if (!this.formModel.name) return;
 
     this.isSavingProfile = true;
-    this.httpService.patch('/admin/profile', this.formModel).subscribe({
-      next: (res) => {
-        this.isSavingProfile = false;
-        this.originalModel = { ...this.formModel };
-        this.discardProfileChanges();
-        this.showToast('Profile details saved.');
-      },
-      error: (err) => {
-        this.isSavingProfile = false;
-        this.showToast('Failed to update.');
-      },
-    });
+    this.httpService
+      .patch('/admin/profile', this.formModel)
+      .pipe(
+        finalize(() => {
+          this.isSavingProfile = false;
+        }),
+      )
+      .subscribe({
+        next: (res) => {
+          this.originalModel = { ...this.formModel };
+          this.discardProfileChanges();
+          this.showToast('Profile details saved.');
+        },
+        error: (err) => {
+          this.showToast('Failed to update.');
+        },
+      });
   }
 
   checkStrength() {
@@ -228,18 +238,22 @@ export class ProfileComponent implements OnInit {
     if (!this.canUpdatePassword()) return;
 
     this.isUpdatingPassword = true;
-    this.httpService.patch('/admin/profile', this.passModel).subscribe({
-      next: (res) => {
-        this.isUpdatingPassword = false;
-        this.discardPasswordChanges();
-        this.showToast('Password securely updated.');
-      },
-      error: (err) => {
-        this.isUpdatingPassword = false;
-        this.showToast('Failed to update.');
-      },
-    });
-    setTimeout(() => {}, 1000);
+    this.httpService
+      .patch('/admin/profile', this.passModel)
+      .pipe(
+        finalize(() => {
+          this.isUpdatingPassword = false;
+        }),
+      )
+      .subscribe({
+        next: (res) => {
+          this.discardPasswordChanges();
+          this.showToast('Password securely updated.');
+        },
+        error: (err) => {
+          this.showToast('Failed to update.');
+        },
+      });
   }
 
   showToast(msg: string) {

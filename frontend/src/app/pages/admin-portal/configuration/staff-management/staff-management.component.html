@@ -15,12 +15,12 @@
       <mat-icon>search</mat-icon>
       <input type="text" [(ngModel)]="searchQuery" placeholder="Search by name, ID or email..." />
     </div>
-    
+
     <div class="filter-select">
       <mat-select [(ngModel)]="filterRole" class="modern-select" panelClass="custom-select-panel">
         <mat-option value="All">All Roles</mat-option>
         @for (role of roles; track role) {
-            <mat-option [value]="role">{{ role }}</mat-option>
+          <mat-option [value]="role.key">{{ role.label }}</mat-option>
         }
       </mat-select>
     </div>
@@ -29,24 +29,27 @@
     }
   </div>
 
-  <p class="results-count text-muted">Showing {{ getFilteredStaff().length }} of {{ totalFilteredItems }} staff</p>
+  <p class="results-count text-muted">
+    Showing {{ getFilteredStaff().length }} of {{ totalFilteredItems }} staff
+  </p>
 
   <!-- Table Section -->
   <div class="table-card mt-24">
     <div class="table-container scrollable-x">
       <table mat-table [dataSource]="getFilteredStaff()" matSort class="modern-table">
-        
         <!-- Staff ID -->
         <ng-container matColumnDef="staffId">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Staff ID </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Staff ID</th>
           <td mat-cell *matCellDef="let staff">
-            <a href="javascript:void(0)" class="id-link" (click)="openStaffDetails(staff)">{{ staff.staffId }}</a>
+            <a href="javascript:void(0)" class="id-link" (click)="openStaffDetails(staff)">{{
+              staff.refId
+            }}</a>
           </td>
         </ng-container>
 
         <!-- Name -->
         <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Name </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
           <td mat-cell *matCellDef="let staff">
             <b>{{ staff.name }}</b>
           </td>
@@ -54,13 +57,13 @@
 
         <!-- Phone -->
         <ng-container matColumnDef="phone">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Phone </th>
-          <td mat-cell *matCellDef="let staff"> {{ staff.phone }} </td>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Phone</th>
+          <td mat-cell *matCellDef="let staff">{{ staff.phone }}</td>
         </ng-container>
 
         <!-- Role -->
         <ng-container matColumnDef="role">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Role </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Role</th>
           <td mat-cell *matCellDef="let staff">
             <span class="role-badge" [class.admin]="staff.role === 'Admin'">{{ staff.role }}</span>
           </td>
@@ -68,14 +71,14 @@
 
         <!-- Branch -->
         <ng-container matColumnDef="branch">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Branch </th>
-          <td mat-cell *matCellDef="let staff"> {{ staff.branch }} </td>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Branch</th>
+          <td mat-cell *matCellDef="let staff">{{ staff.branch.name }}</td>
         </ng-container>
 
         <!-- Email -->
         <ng-container matColumnDef="email">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Email </th>
-          <td mat-cell *matCellDef="let staff"> {{ staff.email }} </td>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
+          <td mat-cell *matCellDef="let staff">{{ staff.email }}</td>
         </ng-container>
 
         <!-- Actions -->
@@ -92,25 +95,25 @@
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
         <!-- Row shown when there is no matching data. -->
         <tr class="mat-row" *matNoDataRow>
           <td class="mat-cell p-24 text-center" colspan="7">
             <div class="empty-state">
-              <mat-icon style="font-size: 48px; width: 48px; height: 48px;">person_off</mat-icon>
-              <h3>No staff found matching the filter "{{searchQuery}}"</h3>
+              <mat-icon style="font-size: 48px; width: 48px; height: 48px">person_off</mat-icon>
+              <h3>No staff found matching the filter "{{ searchQuery }}"</h3>
               <p>Adjust your search filters or add a new staff member.</p>
             </div>
           </td>
         </tr>
       </table>
     </div>
-    
+
     <!-- Reuse Pagination -->
-    <app-pagination 
-      [totalItems]="totalFilteredItems" 
-      [pageSize]="pageSize" 
+    <app-pagination
+      [totalItems]="totalFilteredItems"
+      [pageSize]="pageSize"
       [currentPage]="currentPage"
       (pageChange)="onPageChange($event)"
     ></app-pagination>
@@ -132,7 +135,6 @@
 
   <div class="panel-body">
     <form class="clean-form flex-col gap-24" (ngSubmit)="saveStaff()">
-      
       <!-- Photo Upload -->
       <div class="photo-uploader-section flex-col align-center gap-12">
         <label class="photo-upload-label">
@@ -146,38 +148,71 @@
             }
           </div>
         </label>
-        <p class="text-muted" style="font-size: 0.8rem;">Profile Photo (JPG, PNG)</p>
+        <p class="text-muted" style="font-size: 0.8rem">Profile Photo (JPG, PNG)</p>
       </div>
 
       <!-- Full Name -->
       <div class="form-group">
-        <div class="floating-input-wrapper" [class.focused]="focus['name']"
-          [class.edited]="editMode && staffModel.name !== originalModel.name">
+        <div
+          class="floating-input-wrapper"
+          [class.focused]="focus['name']"
+          [class.edited]="editMode && staffModel.name !== originalModel.name"
+        >
           <mat-icon class="input-icon">person</mat-icon>
-          <input type="text" id="name" name="name" [(ngModel)]="staffModel.name" required (focus)="setFocus('name')"
-            (blur)="clearFocus('name')" placeholder=" " />
+          <input
+            type="text"
+            id="name"
+            name="name"
+            [(ngModel)]="staffModel.name"
+            required
+            (focus)="setFocus('name')"
+            (blur)="clearFocus('name')"
+            placeholder=" "
+          />
           <label for="name">Full Name *</label>
         </div>
       </div>
 
       <!-- Email -->
       <div class="form-group">
-        <div class="floating-input-wrapper" [class.focused]="focus['email']"
-          [class.edited]="editMode && staffModel.email !== originalModel.email">
+        <div
+          class="floating-input-wrapper"
+          [class.focused]="focus['email']"
+          [class.edited]="editMode && staffModel.email !== originalModel.email"
+        >
           <mat-icon class="input-icon">mail</mat-icon>
-          <input type="email" id="email" name="email" [(ngModel)]="staffModel.email" required 
-            (focus)="setFocus('email')" (blur)="clearFocus('email')" placeholder=" " />
+          <input
+            type="email"
+            id="email"
+            name="email"
+            [(ngModel)]="staffModel.email"
+            required
+            (focus)="setFocus('email')"
+            (blur)="clearFocus('email')"
+            placeholder=" "
+          />
           <label for="email">Email *</label>
         </div>
       </div>
 
       <!-- Phone -->
       <div class="form-group">
-        <div class="floating-input-wrapper" [class.focused]="focus['phone']"
-          [class.edited]="editMode && staffModel.phone !== originalModel.phone">
+        <div
+          class="floating-input-wrapper"
+          [class.focused]="focus['phone']"
+          [class.edited]="editMode && staffModel.phone !== originalModel.phone"
+        >
           <mat-icon class="input-icon">phone</mat-icon>
-          <input type="tel" id="phone" name="phone" [(ngModel)]="staffModel.phone" required
-            (focus)="setFocus('phone')" (blur)="clearFocus('phone')" placeholder=" " />
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            [(ngModel)]="staffModel.phone"
+            required
+            (focus)="setFocus('phone')"
+            (blur)="clearFocus('phone')"
+            placeholder=" "
+          />
           <label for="phone">Phone *</label>
         </div>
       </div>
@@ -187,9 +222,17 @@
         <div class="form-group mat-select-group">
           <div class="floating-input-wrapper" [class.focused]="focus['role']">
             <mat-icon class="input-icon">manage_accounts</mat-icon>
-            <mat-select id="role" name="role" [(ngModel)]="staffModel.role" required (focus)="setFocus('role')" (blur)="clearFocus('role')" panelClass="custom-select-panel">
+            <mat-select
+              id="role"
+              name="role"
+              [(ngModel)]="staffModel.role"
+              required
+              (focus)="setFocus('role')"
+              (blur)="clearFocus('role')"
+              panelClass="custom-select-panel"
+            >
               @for (role of roles; track role) {
-                <mat-option [value]="role">{{ role }}</mat-option>
+                <mat-option [value]="role.key">{{ role.label }}</mat-option>
               }
             </mat-select>
             <label for="role" [class.floated]="true">Role *</label>
@@ -200,7 +243,15 @@
         <div class="form-group mat-select-group">
           <div class="floating-input-wrapper" [class.focused]="focus['gender']">
             <mat-icon class="input-icon">wc</mat-icon>
-            <mat-select id="gender" name="gender" [(ngModel)]="staffModel.gender" required (focus)="setFocus('gender')" (blur)="clearFocus('gender')" panelClass="custom-select-panel">
+            <mat-select
+              id="gender"
+              name="gender"
+              [(ngModel)]="staffModel.gender"
+              required
+              (focus)="setFocus('gender')"
+              (blur)="clearFocus('gender')"
+              panelClass="custom-select-panel"
+            >
               <mat-option value="Male">Male</mat-option>
               <mat-option value="Female">Female</mat-option>
               <mat-option value="Other">Other</mat-option>
@@ -214,9 +265,17 @@
       <div class="form-group mat-select-group">
         <div class="floating-input-wrapper" [class.focused]="focus['branch']">
           <mat-icon class="input-icon">corporate_fare</mat-icon>
-          <mat-select id="branch" name="branch" [(ngModel)]="staffModel.branch" required (focus)="setFocus('branch')" (blur)="clearFocus('branch')" panelClass="custom-select-panel">
+          <mat-select
+            id="branch"
+            name="branch"
+            [(ngModel)]="staffModel.branch"
+            required
+            (focus)="setFocus('branch')"
+            (blur)="clearFocus('branch')"
+            panelClass="custom-select-panel"
+          >
             @for (branch of branches; track branch) {
-              <mat-option [value]="branch">{{ branch }}</mat-option>
+              <mat-option [value]="branch.id">{{ branch.name }}</mat-option>
             }
           </mat-select>
           <label for="branch" [class.floated]="true">Branch *</label>
@@ -227,22 +286,34 @@
         <div class="status-toggle-container">
           <span class="toggle-label">Status</span>
           <div class="segmented-control">
-            <button type="button" [class.active]="staffModel.status === 'Active'"
-              (click)="staffModel.status = 'Active'">Active</button>
-            <button type="button" [class.active]="staffModel.status === 'Inactive'"
-              (click)="staffModel.status = 'Inactive'">Inactive</button>
+            <button
+              type="button"
+              [class.active]="staffModel.status === 'Active'"
+              (click)="staffModel.status = 'Active'"
+            >
+              Active
+            </button>
+            <button
+              type="button"
+              [class.active]="staffModel.status === 'Inactive'"
+              (click)="staffModel.status = 'Inactive'"
+            >
+              Inactive
+            </button>
           </div>
         </div>
       </div>
-
     </form>
   </div>
 
   <div class="panel-footer">
     <button type="button" class="btn btn-secondary" (click)="closePanel()">Cancel</button>
-    <button type="submit" class="btn btn-primary"
+    <button
+      type="submit"
+      class="btn btn-primary"
       [disabled]="isSubmitting || (editMode && !hasChanges()) || !formValid()"
-      (click)="saveStaff()">
+      (click)="saveStaff()"
+    >
       @if (isSubmitting) {
         <mat-icon class="spinner">autorenew</mat-icon> Saving...
       } @else {
@@ -251,4 +322,3 @@
     </button>
   </div>
 </div>
-

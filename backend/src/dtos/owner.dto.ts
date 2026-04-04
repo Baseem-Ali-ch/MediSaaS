@@ -52,7 +52,7 @@ export class BranchDTO {
   state?: string;
   country?: string;
   status?: string;
-  isMain?: boolean
+  isMain?: boolean;
 
   constructor(data: Partial<BranchDTO>) {
     if (data.id !== undefined) this.id = Number(data.id); // convert to number
@@ -65,5 +65,35 @@ export class BranchDTO {
     if (data.country !== undefined) this.country = data.country;
     if (data.status !== undefined) this.status = data.status;
     if (data.isMain !== undefined) this.isMain = data.isMain === true;
+  }
+}
+
+export class StaffDTO {
+  id?: number;
+  staffId: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  branch: string;
+  gender: string;
+  photo?: string;
+  status: string;
+
+  constructor(data: Partial<StaffDTO>) {
+    if (data.id !== undefined) this.id = Number(data.id);
+    this.staffId = data.staffId || "";
+    this.name = data.name || "";
+    this.email = data.email || "";
+    this.phone = data.phone || "";
+    this.role = data.role || "";
+    this.branch = data.branch
+      ? typeof data.branch === "string"
+        ? data.branch
+        : String(data.branch)
+      : "";
+    this.gender = data.gender || "";
+    this.photo = data.photo || "";
+    this.status = data.status || "";
   }
 }

@@ -274,7 +274,6 @@ export class BranchesComponent implements OnInit {
             },
             error: (err: any) => {
               this.toastService.show('Failed to delete branch');
-              this.cdr.detectChanges();
             },
           });
         }

@@ -7,7 +7,7 @@ model Branch {
   city      String
   state     String
   country   String
-  status    String    @default("Active")
+  status    String    @default("ACTIVE") // ACTIVE, INACTIVE, SUSPENDED
   isMain    Boolean   @default(false)
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
@@ -16,4 +16,5 @@ model Branch {
   lab   Lab @relation(fields: [labId], references: [id])
 
   users User[]
+  activityLogs ActivityLog[]
 }

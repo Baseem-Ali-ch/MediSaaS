@@ -6,7 +6,11 @@ import {
   verifyToken,
 } from "../../utils/token";
 import crypto from "crypto";
-import { sendResetPasswordLink, sendVerificationUrl } from "../shared.service";
+import {
+  logActivity,
+  sendResetPasswordLink,
+  sendVerificationUrl,
+} from "../shared.service";
 import { RegisterLabData } from "../../types/auth.type";
 import { LabRepository } from "../../repositories/lab.repository";
 import { UserRepository } from "../../repositories/user.repository";
@@ -52,7 +56,6 @@ export const registerLab = async (data: RegisterLabData) => {
     city: data.city,
     state: data.state,
     country: data.country,
-    status: "Active",
     isMain: true,
     lab: { connect: { id: lab.id } },
   });
@@ -62,8 +65,7 @@ export const registerLab = async (data: RegisterLabData) => {
     email: data.ownerEmail,
     phone: data.ownerPhone,
     password: hashedPassword,
-    role: "admin",
-    emailVerified: false,
+    role: "OWNER",
     emailVerificationToken: verificationToken,
     emailVerificationExpires: new Date(Date.now() + 24 * 60 * 60 * 1000),
     lab: { connect: { id: lab.id } },
@@ -73,14 +75,30 @@ export const registerLab = async (data: RegisterLabData) => {
   sendVerificationUrl(data.labEmail, verificationToken);
 };
 
-export const login = async (data: { email: string; password: string }) => {
+export const login = async (
+  data: { email: string; password: string },
+  ipAddress: string | null,
+) => {
   const user = await userRepo.findByEmail(data.email);
   if (!user) {
     throw new Error("Invalid email or password");
   }
 
-  if(!user.emailVerified){
+  if (!user.emailVerified) {
     throw new Error("Please verify your email address before logging in");
+  }
+
+  if (user.status === "SUSPENDED") {
+    throw new Error("Your account has been suspended. Please contact support.");
+  }
+
+  if (user.branchId) {
+    const branch = await branchRepo.findById(user.branchId);
+    if (branch?.status === "SUSPENDED") {
+      throw new Error(
+        "Your branch has been suspended. Please contact support.",
+      );
+    }
   }
 
   const isMatch = await comparePassword(data.password, user.password);
@@ -96,6 +114,17 @@ export const login = async (data: { email: string; password: string }) => {
     { userId: user.id, role: user.role },
     "7d",
   );
+
+  await logActivity({
+    performedById: user.id!,
+    labId: user.labId!,
+    branchId: user.branchId,
+    action: "LOGIN",
+    entity: "User",
+    message: "User logged in",
+    metadata: { name: user.name, email: user.email, role: user.role },
+    ipAddress: ipAddress,
+  });
 
   return { user, accessToken, refreshToken };
 };
