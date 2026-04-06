@@ -72,7 +72,7 @@ export const registerLab = async (data: RegisterLabData) => {
     branch: { connect: { id: branch.id } },
   });
 
-  sendVerificationUrl(data.labEmail, verificationToken);
+  await sendVerificationUrl(data.ownerEmail, verificationToken);
 };
 
 export const login = async (
@@ -84,7 +84,7 @@ export const login = async (
     throw new Error("Invalid email or password");
   }
 
-  if (!user.emailVerified) {
+  if (!user.emailVerified && user.role !== "STAFF") {
     throw new Error("Please verify your email address before logging in");
   }
 
@@ -106,6 +106,14 @@ export const login = async (
     throw new Error("Invalid email or password");
   }
 
+  if (user.role === "STAFF" && user.emailVerified === false) {
+    await userRepo.update(user.id, {
+      emailVerified: true,
+      inviteToken: null,
+      inviteTokenExpires: null
+    });
+  }
+
   const accessToken = generateToken(
     { userId: user.id, role: user.role },
     "15m",
@@ -121,15 +129,23 @@ export const login = async (
     branchId: user.branchId,
     action: "LOGIN",
     entity: "User",
-    message: "User logged in",
-    metadata: { name: user.name, email: user.email, role: user.role },
-    ipAddress: ipAddress,
+    message: `${user.email} logged in`,
+    metadata: {
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      ipAddress: ipAddress,
+      timestamp: new Date().toISOString(),
+    },
   });
 
   return { user, accessToken, refreshToken };
 };
 
-export const verifyEmail = async (data: { token: string }) => {
+export const verifyEmail = async (
+  data: { token: string },
+  ipAddress: string | null,
+) => {
   const user = await userRepo.findByToken(data.token);
   if (!user) {
     throw new Error("Invalid verification token");
@@ -138,6 +154,7 @@ export const verifyEmail = async (data: { token: string }) => {
   await userRepo.update(user.id, {
     emailVerified: true,
     emailVerificationToken: null,
+    emailVerificationExpires: null
   });
 
   const accessToken = generateToken(
@@ -148,6 +165,22 @@ export const verifyEmail = async (data: { token: string }) => {
     { userId: user.id, role: user.role },
     "7d",
   );
+
+  await logActivity({
+    performedById: user.id!,
+    labId: user.labId!,
+    branchId: user.branchId,
+    action: "REGISTER",
+    entity: "User",
+    message: `${user.email} registered and email verified`,
+    metadata: {
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      ipAddress: ipAddress,
+      timestamp: new Date().toISOString(),
+    },
+  });
 
   return { user, accessToken, refreshToken };
 };
@@ -192,10 +225,13 @@ export const forgotPassword = async (data: { email: string }) => {
   await sendResetPasswordLink(data.email, resetToken);
 };
 
-export const resetPassword = async (data: {
-  password: string;
-  resetToken: string;
-}) => {
+export const resetPassword = async (
+  data: {
+    password: string;
+    resetToken: string;
+  },
+  ipAddress: string | null,
+) => {
   const { password } = data;
   const user = await userRepo.findByToken(data.resetToken);
   if (!user) {
@@ -206,6 +242,22 @@ export const resetPassword = async (data: {
     password: hashedPassword,
     jwtToken: null,
     jwtTokenExpires: null,
+  });
+
+  await logActivity({
+    performedById: user.id!,
+    labId: user.labId!,
+    branchId: user.branchId,
+    action: "PASSWORD_RESET",
+    entity: "User",
+    message: `${user.email} reset their password`,
+    metadata: {
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      ipAddress: ipAddress,
+      timestamp: new Date().toISOString(),
+    },
   });
 };
 

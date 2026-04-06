@@ -78,8 +78,9 @@ export class VerifyEmailPage implements OnInit {
       .subscribe({
         next: (res: any) => {
           if (res.success) {
-            this.tokenService.setTokens(res.token.accessToken, res.token.refreshToken);
-            this.router.navigate(['/admin/dashboard']);
+            this.tokenService.setTokens(res.data.token.accessToken, res.data.token.refreshToken);
+            localStorage.setItem('role', res.data.user.role.toLowerCase());
+            this.router.navigate([`/${res.data.user.role.toLowerCase()}/dashboard`]);
           } else {
             this.snack.open(res.message, 'OK', { duration: 3000 });
           }

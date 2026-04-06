@@ -41,7 +41,7 @@ export const sendInvitationEmail = async (
     STAFF_NAME: staffName,
     STAFF_EMAIL: email,
     TEMP_PASSWORD: password,
-    INVITE_URL: `${process.env.FRONTEND_URL}/auth/invite?token=${token}`,
+    INVITE_URL: `${process.env.FRONTEND_URL}/auth/login?invite-token=${token}`,
   });
   const transporter = await emailService();
   await transporter.sendMail({
@@ -60,7 +60,6 @@ interface LogActivityParams {
   entity: string;
   message?: string;
   metadata?: Record<string, any> | null;
-  ipAddress: string | null;
 }
 
 export const logActivity = async ({
@@ -71,14 +70,12 @@ export const logActivity = async ({
   entity,
   message,
   metadata,
-  ipAddress,
 }: LogActivityParams) => {
   await activityLogRepo.create({
     action,
     entity,
     message,
     metadata: metadata ? JSON.stringify(metadata) : null,
-    ipAddress: ipAddress ?? null,
     performedBy: { connect: { id: performedById } },
     lab: { connect: { id: labId } },
     ...(branchId && {

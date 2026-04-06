@@ -36,10 +36,12 @@ export const login = async (
     res.status(200).json({
       success: true,
       message: "Login successful",
-      token: {
-        accessToken: result.accessToken,
-        refreshToken: result.refreshToken,
+      data: {
         user: result.user,
+        token: {
+          accessToken: result.accessToken,
+          refreshToken: result.refreshToken,
+        },
       },
     });
   } catch (error) {
@@ -54,16 +56,20 @@ export const verifyEmail = async (
   next: NextFunction,
 ) => {
   try {
+    const ipAddress =
+      req.ip ?? (req.headers["x-forwarded-for"] as string) ?? null;
     const dto = new authDto.VerifyEmailDTO(req.query);
     const data = authMap.MapVerifyEmail(dto);
-    const result = await authService.verifyEmail(data);
+    const result = await authService.verifyEmail(data, ipAddress);
     res.status(200).json({
       success: true,
       message: "Email verified successfully",
-      token: {
-        accessToken: result.accessToken,
-        refreshToken: result.refreshToken,
+      data: {
         user: result.user,
+        token: {
+          accessToken: result.accessToken,
+          refreshToken: result.refreshToken,
+        },
       },
     });
   } catch (error) {
@@ -116,9 +122,11 @@ export const resetPassword = async (
   next: NextFunction,
 ) => {
   try {
+    const ipAddress =
+      req.ip ?? (req.headers["x-forwarded-for"] as string) ?? null;
     const dto = new authDto.ResetPasswordDTO(req.body, req.query);
     const data = authMap.MapResetPassword(dto);
-    await authService.resetPassword(data);
+    await authService.resetPassword(data, ipAddress);
     res.status(200).json({
       success: true,
       message: "Password reset successfully",

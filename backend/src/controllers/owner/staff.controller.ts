@@ -25,10 +25,13 @@ export const createStaff = async (req: any, res: Response) => {
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
-    
+
+    const ipAddress =
+      req.ip ?? (req.headers["x-forwarded-for"] as string) ?? null;
+
     const dto = new ownerDto.StaffDTO(req.body);
     const data = ownerMap.MapCreateStaff(dto);
-    const staff = await staffService.createStaff(userId, data);
+    const staff = await staffService.createStaff(userId, data, ipAddress);
     res.status(201).json({
       success: true,
       message: "Staff created successfully",
@@ -41,26 +44,55 @@ export const createStaff = async (req: any, res: Response) => {
 };
 
 export const updateStaff = async (req: any, res: Response) => {
-  const userId = req.user?.id;
-  if (!userId) {
-    return res.status(401).json({ success: false, message: "Unauthorized" });
-  }
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
 
-  const staffId = Number(req.params.staffId);
-  const dto = new ownerDto.StaffDTO(req.body);
-  const data = ownerMap.MapCreateStaff(dto);
-  const staff = await staffService.updateStaff(userId, staffId, data);
-  res.json({ success: true, data: staff });
+    const ipAddress =
+      req.ip ?? (req.headers["x-forwarded-for"] as string) ?? null;
+
+    const staffId = Number(req.params.staffId);
+    const dto = new ownerDto.StaffDTO(req.body);
+    const data = ownerMap.MapCreateStaff(dto);
+    const staff = await staffService.updateStaff(
+      userId,
+      staffId,
+      data,
+      ipAddress,
+    );
+    res.json({
+      success: true,
+      message: "Staff updated successfully",
+      data: staff,
+    });
+  } catch (error) {
+    logger.error("[Controller] Error updating staff:", error);
+    res.status(500).json({ success: false, message: "Failed to update staff" });
+  }
 };
 
 export const deleteStaff = async (req: any, res: Response) => {
-  const userId = req.user?.id;
-  if (!userId) {
-    return res.status(401).json({ success: false, message: "Unauthorized" });
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    const ipAddress =
+      req.ip ?? (req.headers["x-forwarded-for"] as string) ?? null;
+
+    const staffId = Number(req.params.staffId);
+
+    const staff = await staffService.deleteStaff(userId, staffId, ipAddress);
+    res.json({
+      success: true,
+      message: "Staff deleted successfully",
+      data: staff,
+    });
+  } catch (error) {
+    logger.error("[Controller] Error deleting staff:", error);
+    res.status(500).json({ success: false, message: "Failed to delete staff" });
   }
-
-  const staffId = Number(req.params.staffId);
-
-  await staffService.deleteStaff(userId, staffId);
-  res.json({ success: true, message: "Staff deleted successfully" });
 };

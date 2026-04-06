@@ -4,6 +4,7 @@ import { UserRepository } from "../../repositories/user.repository";
 import { prisma } from "../../lib/prisma";
 import { User } from "@prisma/client";
 import { hashPassword } from "../../utils/password";
+import { logActivity } from "../shared.service";
 
 const userRepo = new UserRepository(prisma);
 
@@ -16,17 +17,41 @@ export const getProfile = async (userId: number) => {
   return user;
 };
 
-export const updateProfile = async(userId: number, data: Partial<User>) => {
+export const updateProfile = async (
+  userId: number,
+  data: Partial<User>,
+  ipAddress: string | null,
+) => {
   const user = await userRepo.findById(userId);
   if (!user) {
     throw new Error("User not found");
   }
 
   const updatedUser = await userRepo.update(userId, data);
-  return updatedUser;
-}
+  await logActivity({
+    performedById: user.id!,
+    labId: user.labId!,
+    branchId: user.branchId,
+    action: "PROFILE_UPDATE",
+    entity: "User",
+    message: `${user.email} updated their profile`,
+    metadata: {
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      ipAddress: ipAddress,
+      timestamp: new Date().toISOString(),
+    },
+  });
 
-export const changePassword = async (userId: number, data: { currentPassword: string; newPassword: string }) => {
+  return updatedUser;
+};
+
+export const changePassword = async (
+  userId: number,
+  data: { currentPassword: string; newPassword: string },
+  ipAddress: string | null,
+) => {
   const user = await userRepo.findById(userId);
   if (!user) {
     throw new Error("User not found");
@@ -37,8 +62,23 @@ export const changePassword = async (userId: number, data: { currentPassword: st
     throw new Error("Current password is incorrect");
   }
 
-   const hashedPassword = await hashPassword(data.newPassword);
+  const hashedPassword = await hashPassword(data.newPassword);
 
   await userRepo.update(userId, { password: hashedPassword });
+  await logActivity({
+    performedById: user.id!,
+    labId: user.labId!,
+    branchId: user.branchId,
+    action: "PROFILE_UPDATE",
+    entity: "User",
+    message: `${user.email} reset their password`,
+    metadata: {
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      ipAddress: ipAddress,
+      timestamp: new Date().toISOString(),
+    },
+  });
   return;
-}
+};

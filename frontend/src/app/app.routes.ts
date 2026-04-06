@@ -8,39 +8,71 @@ import { LoginPage } from './pages/auth/login/login';
 import { ForgotPasswordPage } from './pages/auth/forgot-password/forgot-password';
 import { VerifyEmailPage } from './pages/auth/verify-email/verify-email';
 import { ResetPasswordPage } from './pages/auth/reset-password/reset-password';
-
 import { AdminLayoutComponent } from './pages/admin-portal/layout/admin-layout.component';
 import { DashboardComponent } from './pages/admin-portal/dashboard/dashboard.component';
+import { authGuard } from './guards/auth-guard';
+import { roleGuard, roleMatchGuard } from './guards/role-guard';
+import { authRedirectGuard } from './guards/auth-redirect-guard';
+import { NotFoundPage } from './pages/public/not-found/not-found';
 
 export const routes: Routes = [
-    { path: '', component: Home },
-    { path: 'home', component: Home },
-    { path: 'about', component: AboutPage },
-    { path: 'contact', component: ContactPage },
-    { path: 'pricing', component: PricingPage },
+  { path: '', component: Home },
+  { path: 'home', component: Home },
+  { path: 'about', component: AboutPage },
+  { path: 'contact', component: ContactPage },
+  { path: 'pricing', component: PricingPage },
 
-    {
-        path: 'auth',
-        children: [
-            { path: '', redirectTo: 'login', pathMatch: 'full' },
-            { path: 'login', component: LoginPage },
-            { path: 'register-lab', component: RegisterPage },
-            { path: 'forgot-password', component: ForgotPasswordPage },
-            { path: 'verify-email', component: VerifyEmailPage },
-            { path: 'reset-password', component: ResetPasswordPage }
-        ]
-    },
+  {
+    path: 'auth',
+    canActivate: [authRedirectGuard],
+    children: [
+      { path: '', redirectTo: 'login', pathMatch: 'full' },
+      { path: 'login', component: LoginPage },
+      { path: 'register-lab', component: RegisterPage },
+      { path: 'forgot-password', component: ForgotPasswordPage },
+      { path: 'verify-email', component: VerifyEmailPage },
+      { path: 'reset-password', component: ResetPasswordPage },
+    ],
+  },
 
-    {
-        path: 'admin',
-        component: AdminLayoutComponent,
-        children: [
-            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-            { path: 'dashboard', component: DashboardComponent },
-            { path: 'profile', loadComponent: () => import('./pages/admin-portal/profile/profile.component').then(m => m.ProfileComponent) },
-            { path: 'lab-management', loadComponent: () => import('./pages/admin-portal/configuration/lab-management/lab-management.component').then(m => m.LabManagementComponent) },
-            { path: 'branch-management', loadComponent: () => import('./pages/admin-portal/configuration/branches/branches.component').then(m => m.BranchesComponent) },
-            { path: 'staff-management', loadComponent: () => import('./pages/admin-portal/configuration/staff-management/staff-management.component').then(m => m.StaffManagementComponent) }
-        ]
-    }
+  {
+    path: ':role',
+    component: AdminLayoutComponent,
+    canMatch: [roleMatchGuard],
+    canActivate: [authGuard, roleGuard],
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: DashboardComponent },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./pages/admin-portal/profile/profile.component').then((m) => m.ProfileComponent),
+      },
+      {
+        path: 'lab-management',
+        loadComponent: () =>
+          import('./pages/admin-portal/configuration/lab-management/lab-management.component').then(
+            (m) => m.LabManagementComponent,
+          ),
+      },
+      {
+        path: 'branch-management',
+        loadComponent: () =>
+          import('./pages/admin-portal/configuration/branches/branches.component').then(
+            (m) => m.BranchesComponent,
+          ),
+      },
+      {
+        path: 'staff-management',
+        loadComponent: () =>
+          import('./pages/admin-portal/configuration/staff-management/staff-management.component').then(
+            (m) => m.StaffManagementComponent,
+          ),
+      },
+      { path: '**', redirectTo: '/404' },
+    ],
+  },
+
+  { path: '404', component: NotFoundPage },
+  { path: '**', redirectTo: '404' },
 ];

@@ -1,0 +1,33 @@
+<div class="not-found-container">
+  <div class="content card shadow-lg animate-fade-in">
+    <div class="illustration-wrapper">
+      <img src="/images/404.png" alt="404 Not Found" class="illustration" />
+      <div class="floating-badge">404</div>
+    </div>
+
+    <div class="text-content">
+      <h1 class="gradient-text">Oops! Path Not Found</h1>
+      <p class="lead">
+        It seems you've wandered into an uncharted ward. The laboratory results for this page are
+        missing.
+      </p>
+
+      <div class="actions">
+        <a class="btn btn-primary" (click)="goBack()">
+          <span class="material-icons">home</span>
+          <span>Back to Home</span>
+        </a>
+        <a routerLink="/contact" class="btn btn-secondary">
+          <span class="material-icons">support_agent</span>
+          <span>Contact Support</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="background-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+</div>

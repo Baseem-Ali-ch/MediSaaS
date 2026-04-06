@@ -29,10 +29,12 @@ export const createBranch = async (req: any, res: Response) => {
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
+    const ipAddress =
+      req.ip ?? (req.headers["x-forwarded-for"] as string) ?? null;
 
     const dto = new ownerDto.BranchDTO(req.body);
     const data = ownerMap.MapCreateBranch(dto);
-    const result = await branchService.createBranch(userId, data);
+    const result = await branchService.createBranch(userId, data, ipAddress);
     res.status(200).json({
       success: true,
       message: "Branch created successfully",
@@ -55,15 +57,25 @@ export const udpateBranch = async (
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-    const branchId = parseInt(req.params.id); 
+    const ipAddress =
+      req.ip ?? (req.headers["x-forwarded-for"] as string) ?? null;
+
+    const branchId = parseInt(req.params.id);
     if (isNaN(branchId)) {
-      return res.status(400).json({ success: false, message: "Invalid branch ID" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid branch ID" });
     }
 
     const dto = new ownerDto.BranchDTO(req.body);
     const data = ownerMap.MapUpdateBranch(dto);
 
-    const result = await branchService.updateBranch(userId, branchId, data);
+    const result = await branchService.updateBranch(
+      userId,
+      branchId,
+      data,
+      ipAddress,
+    );
     res.status(200).json({
       success: true,
       message: "Branch updated successfully",
@@ -82,12 +94,17 @@ export const deleteBranch = async (req: any, res: Response) => {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
+    const ipAddress =
+      req.ip ?? (req.headers["x-forwarded-for"] as string) ?? null;
+
     const branchId = parseInt(req.params.id);
     if (isNaN(branchId)) {
-      return res.status(400).json({ success: false, message: "Invalid branch ID" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid branch ID" });
     }
 
-    await branchService.deleteBranch(userId, branchId);
+    await branchService.deleteBranch(userId, branchId, ipAddress);
     res.status(200).json({
       success: true,
       message: "Branch deleted successfully",

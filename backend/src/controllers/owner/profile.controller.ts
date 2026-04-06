@@ -34,6 +34,8 @@ export const udpateProfile = async (
 ) => {
   try {
     const userId = req.user?.id;
+    const ipAddress =
+      req.ip ?? (req.headers["x-forwarded-for"] as string) ?? null;
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
@@ -41,7 +43,7 @@ export const udpateProfile = async (
     const dto = new adminDto.UpdateProfileDTO(req.body);
     const data = adminMap.MapUpdateProfile(dto);
 
-    const result = await profileService.updateProfile(userId, data);
+    const result = await profileService.updateProfile(userId, data, ipAddress);
     res.status(200).json({
       success: true,
       message: "Profile updated successfully",
@@ -56,23 +58,25 @@ export const udpateProfile = async (
 export const changePassword = async (
   req: any,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
-  try{
+  try {
     const userId = req.user?.id;
+    const ipAddress =
+      req.ip ?? (req.headers["x-forwarded-for"] as string) ?? null;
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
 
-      const dto = new adminDto.ChangePasswordDTO(req.body);
-      const data = adminMap.MapChangePassword(dto);
-      await profileService.changePassword(userId, data);
-      res.status(200).json({
-        success: true,
-        message: "Password changed successfully",
-      });
-  }catch(error){
+    const dto = new adminDto.ChangePasswordDTO(req.body);
+    const data = adminMap.MapChangePassword(dto);
+    await profileService.changePassword(userId, data, ipAddress);
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully",
+    });
+  } catch (error) {
     logger.error("[Controller] Change Password", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
-}
+};

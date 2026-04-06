@@ -22,8 +22,8 @@ export interface StaffData {
   name: string;
   email: string;
   phone: string;
-  role: 'Admin' | 'Doctor' | 'Reception' | 'Lab Technician';
-  branch: string;
+  role: string;
+  branch: number;
   gender: 'Male' | 'Female' | 'Other';
   photo?: string;
   status: 'Active' | 'Inactive';
@@ -68,7 +68,7 @@ export class StaffManagementComponent implements OnInit {
   focus: Record<string, boolean> = {};
   branches: any[] = [];
   roles = [
-    { label: 'staff', key: 'STAFF' },
+    { label: 'Staff', key: 'STAFF' },
     { label: 'Reception', key: 'RECEPTIONIST' },
     { label: 'Lab Technician', key: 'TECHNICIAN' },
     { label: 'Branch Manager', key: 'BRANCH_MANAGER' },
@@ -171,8 +171,8 @@ export class StaffManagementComponent implements OnInit {
       name: '',
       email: '',
       phone: '',
-      role: 'Reception',
-      branch: 'Main Branch',
+      role: 'STAFF',
+      branch: 1,
       gender: 'Male',
       status: 'Active',
     };
@@ -256,10 +256,13 @@ export class StaffManagementComponent implements OnInit {
               this.toastService.show(res.message || 'Failed to update staff');
               return;
             }
-            const idx = this.staffList.findIndex((s) => s.id === this.staffModel.id);
-            if (idx !== -1) {
-              this.staffList[idx] = { ...this.staffModel };
-              this.toastService.show('Staff updated successfully');
+
+            if (res.success) {
+              const idx = this.staffList.findIndex((s) => s.id === this.staffModel.id);
+              if (idx !== -1) {
+                this.staffList[idx] = { ...this.staffModel };
+                this.toastService.show('Staff updated successfully');
+              }
               this.closePanel();
             }
           },
@@ -282,20 +285,20 @@ export class StaffManagementComponent implements OnInit {
               this.toastService.show(res.message || 'Failed to add staff');
               return;
             }
-            const newStaff = { ...this.staffModel, ...(res.data || {}) };
-            if (!newStaff.id && res.id) newStaff.id = res.id;
-            this.staffList.push(newStaff);
-            this.toastService.show('Staff added successfully');
-            this.closePanel();
+
+            if (res.success) {
+              const newStaff = { ...this.staffModel, ...(res.data || {}) };
+              if (!newStaff.id && res.id) newStaff.id = res.id;
+              this.staffList.push(newStaff);
+              this.toastService.show('Staff added successfully');
+              this.closePanel();
+            }
           },
           error: (err: any) => {
             this.toastService.show('Failed to add staff');
           },
         });
     }
-    this.isSubmitting = false;
-    this.isPanelOpen = false;
-    this.cdr.detectChanges();
   }
 
   onPhotoSelected(event: any) {

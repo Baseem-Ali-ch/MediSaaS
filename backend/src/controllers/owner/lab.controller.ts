@@ -30,6 +30,8 @@ export const updateLab = async (
 ) => {
   try {
     const userId = req.user?.id;
+    const ipAddress =
+      req.ip ?? (req.headers["x-forwarded-for"] as string) ?? null;
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
@@ -37,7 +39,7 @@ export const updateLab = async (
     const dto = new adminDto.UpdateLabDTO(req.body);
     const data = adminMap.MapUpdateLab(dto);
 
-    const result = await labService.updateLab(userId, data);
+    const result = await labService.updateLab(userId, data, ipAddress);
     res.status(200).json({
       success: true,
       message: "Lab updated successfully",
