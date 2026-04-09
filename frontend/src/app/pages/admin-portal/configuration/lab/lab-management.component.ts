@@ -64,7 +64,7 @@ export class LabManagementComponent implements OnInit {
   getLabDetails() {
     this.loaderService.show();
     this.httpService
-      .get('/admin/lab')
+      .get('/owner/lab')
       .pipe(
         finalize(() => {
           this.loaderService.hide();
@@ -161,7 +161,7 @@ export class LabManagementComponent implements OnInit {
     }
 
     this.httpService
-      .patch(`/admin/lab/${labId}`, this.labData)
+      .patch(`/owner/lab/${labId}`, this.labData)
       .pipe(
         finalize(() => {
           this.isSaving = false;

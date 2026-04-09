@@ -15,7 +15,8 @@ model Branch {
   labId Int
   lab   Lab @relation(fields: [labId], references: [id])
 
-  users User[]
+  users        User[]
   activityLogs ActivityLog[]
-  patients Patient[]
+  patients     Patient[]
+  tests        Test[]
 }

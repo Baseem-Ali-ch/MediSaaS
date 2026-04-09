@@ -1,0 +1,580 @@
+<div class="page-container">
+  <div class="page-header flex-between">
+    <div class="header-title">
+      <h1>Test Management</h1>
+      <p class="text-muted">Configure and manage laboratory tests and parameters</p>
+    </div>
+    <button class="btn btn-primary" (click)="openAddPanel()">
+      <mat-icon>add_circle</mat-icon> Create New Test
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-row">
+    <div class="search-box">
+      <mat-icon>search</mat-icon>
+      <input type="text" [(ngModel)]="searchQuery" placeholder="Search by test name or code..." />
+    </div>
+
+    <div class="filter-select">
+      <mat-select
+        [(ngModel)]="filterCategory"
+        class="modern-select"
+        panelClass="custom-select-panel"
+      >
+        <mat-option value="All">All Categories</mat-option>
+        @for (cat of categories; track cat) {
+          <mat-option [value]="cat">{{ cat }}</mat-option>
+        }
+      </mat-select>
+    </div>
+    @if (searchQuery || filterCategory !== 'All') {
+      <button class="btn text-btn" (click)="clearFilters()">Clear Filters</button>
+    }
+  </div>
+
+  <p class="results-count text-muted">
+    Showing {{ getFilteredTests().length }} of {{ totalFilteredItems }} tests
+  </p>
+
+  <!-- Table Section -->
+  <div class="table-card mt-24">
+    <div class="table-container scrollable-x">
+      <table mat-table [dataSource]="getFilteredTests()" matSort class="modern-table">
+        <ng-container matColumnDef="testCode">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Test Code</th>
+          <td mat-cell *matCellDef="let test">
+            <a href="javascript:void(0)" class="id-link" (click)="openTestDetails(test)">
+              {{ test.testCode }}
+            </a>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="testName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Test Name</th>
+          <td mat-cell *matCellDef="let test">
+            <div class="flex-col">
+              <span>{{ test.testName }}</span>
+              <small class="text-muted">{{ test.shortName }}</small>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="category">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
+          <td mat-cell *matCellDef="let test">{{ test.category }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="sampleType">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Sample Type</th>
+          <td mat-cell *matCellDef="let test">{{ test.sampleType }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
+          <td mat-cell *matCellDef="let test">{{ test.price | currency: 'INR' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="resultType">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Result Type</th>
+          <td mat-cell *matCellDef="let test">{{ test.resultType }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+          <td mat-cell *matCellDef="let test">
+            <span class="role-badge" [class.admin]="test.status === 'Active'">{{
+              test.status
+            }}</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let test" class="text-right">
+            <button class="action-btn" (click)="openEditPanel(test)" matTooltip="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button class="action-btn text-danger" (click)="deleteTest(test)" matTooltip="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell p-24 text-center" colspan="8">
+            <div class="empty-state">
+              <mat-icon style="font-size: 48px; width: 48px; height: 48px">science</mat-icon>
+              <h3>No tests found</h3>
+              <p>Try adjusting your search or add a new test record.</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <app-pagination
+      [totalItems]="totalFilteredItems"
+      [pageSize]="pageSize"
+      [currentPage]="currentPage"
+      (pageChange)="onPageChange($event)"
+    ></app-pagination>
+  </div>
+</div>
+
+<!-- Slide Over Panel Overlay -->
+<div class="panel-overlay" [class.open]="isPanelOpen" (click)="closePanel()"></div>
+
+<!-- Slide Over Panel (Test Form) -->
+<div class="slide-panel wide-panel" [class.open]="isPanelOpen">
+  <div class="panel-header-simple">
+    <div class="panel-title">
+      <mat-icon>{{ editMode ? 'edit_note' : 'add_circle' }}</mat-icon>
+      <h2>{{ editMode ? 'Edit Test' : 'Create New Test' }}</h2>
+    </div>
+    <button class="close-btn" (click)="closePanel()"><mat-icon>close</mat-icon></button>
+  </div>
+
+  <div class="panel-body">
+    <form class="clean-form flex-col gap-32">
+      <!-- Section 1: Basic Information -->
+      <section class="form-section">
+        <div class="section-header">
+          <mat-icon>info</mat-icon>
+          <h3>Basic Information</h3>
+        </div>
+
+        <div class="grid-2 mt-16">
+          <div class="form-group">
+            <div class="floating-input-wrapper" [class.focused]="focus['testCode']">
+              <mat-icon class="input-icon">qr_code</mat-icon>
+              <input
+                type="text"
+                id="testCode"
+                name="testCode"
+                [(ngModel)]="testModel.testCode"
+                required
+                (focus)="setFocus('testCode')"
+                (blur)="clearFocus('testCode')"
+                placeholder=" "
+              />
+              <label for="testCode">Test Code *</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="floating-input-wrapper" [class.focused]="focus['testName']">
+              <mat-icon class="input-icon">science</mat-icon>
+              <input
+                type="text"
+                id="testName"
+                name="testName"
+                [(ngModel)]="testModel.testName"
+                required
+                (focus)="setFocus('testName')"
+                (blur)="clearFocus('testName')"
+                placeholder=" "
+              />
+              <label for="testName">Test Name *</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2 mt-16">
+          <div class="form-group">
+            <div class="floating-input-wrapper" [class.focused]="focus['shortName']">
+              <mat-icon class="input-icon">label</mat-icon>
+              <input
+                type="text"
+                id="shortName"
+                name="shortName"
+                [(ngModel)]="testModel.shortName"
+                (focus)="setFocus('shortName')"
+                (blur)="clearFocus('shortName')"
+                placeholder=" "
+              />
+              <label for="shortName">Short Name</label>
+            </div>
+          </div>
+          <div class="form-group mat-select-group">
+            <div class="floating-input-wrapper" [class.focused]="focus['category']">
+              <mat-icon class="input-icon">category</mat-icon>
+              <mat-select
+                id="category"
+                name="category"
+                [(ngModel)]="testModel.category"
+                required
+                (focus)="setFocus('category')"
+                (blur)="clearFocus('category')"
+                panelClass="custom-select-panel"
+              >
+                @for (cat of categories; track cat) {
+                  <mat-option [value]="cat">{{ cat }}</mat-option>
+                }
+              </mat-select>
+              <label for="category" class="floated">Category *</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2 mt-16">
+          <div class="form-group mat-select-group">
+            <div class="floating-input-wrapper" [class.focused]="focus['sampleType']">
+              <mat-icon class="input-icon">colorize</mat-icon>
+              <mat-select
+                id="sampleType"
+                name="sampleType"
+                [(ngModel)]="testModel.sampleType"
+                required
+                (focus)="setFocus('sampleType')"
+                (blur)="clearFocus('sampleType')"
+                panelClass="custom-select-panel"
+              >
+                @for (st of sampleTypes; track st) {
+                  <mat-option [value]="st">{{ st }}</mat-option>
+                }
+              </mat-select>
+              <label for="sampleType" class="floated">Sample Type *</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="floating-input-wrapper" [class.focused]="focus['price']">
+              <mat-icon class="input-icon">payments</mat-icon>
+              <input
+                type="number"
+                id="price"
+                name="price"
+                [(ngModel)]="testModel.price"
+                required
+                (focus)="setFocus('price')"
+                (blur)="clearFocus('price')"
+                placeholder=" "
+              />
+              <label for="price">Price *</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group mt-16">
+          <div class="status-toggle-container">
+            <span class="toggle-label">Status</span>
+            <div class="segmented-control">
+              <button
+                type="button"
+                [class.active]="testModel.status === 'Active'"
+                (click)="testModel.status = 'Active'"
+              >
+                Active
+              </button>
+              <button
+                type="button"
+                [class.active]="testModel.status === 'Inactive'"
+                (click)="testModel.status = 'Inactive'"
+              >
+                Inactive
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 2: Clinical Configuration -->
+      <section class="form-section">
+        <div class="section-header">
+          <mat-icon>settings_suggest</mat-icon>
+          <h3>Clinical Configuration</h3>
+        </div>
+
+        <div class="grid-2 mt-16">
+          <div class="form-group mat-select-group">
+            <div class="floating-input-wrapper" [class.focused]="focus['resultType']">
+              <mat-icon class="input-icon">assignment</mat-icon>
+              <mat-select
+                id="resultType"
+                name="resultType"
+                [(ngModel)]="testModel.resultType"
+                (focus)="setFocus('resultType')"
+                (blur)="clearFocus('resultType')"
+                panelClass="custom-select-panel"
+              >
+                @for (rt of resultTypes; track rt) {
+                  <mat-option [value]="rt">{{ rt }}</mat-option>
+                }
+              </mat-select>
+              <label for="resultType" class="floated">Result Type</label>
+            </div>
+          </div>
+
+          @if (testModel.resultType === 'Numeric') {
+            <div class="form-group">
+              <div class="floating-input-wrapper" [class.focused]="focus['unit']">
+                <mat-icon class="input-icon">straighten</mat-icon>
+                <input
+                  type="text"
+                  id="unit"
+                  name="unit"
+                  [(ngModel)]="testModel.unit"
+                  (focus)="setFocus('unit')"
+                  (blur)="clearFocus('unit')"
+                  placeholder=" "
+                />
+                <label for="unit">Unit</label>
+              </div>
+            </div>
+          } @else if (testModel.resultType !== 'Multi Parameter') {
+            <div class="form-group">
+              <div class="floating-input-wrapper" [class.focused]="focus['method']">
+                <mat-icon class="input-icon">psychology</mat-icon>
+                <input
+                  type="text"
+                  id="method"
+                  name="method"
+                  [(ngModel)]="testModel.method"
+                  (focus)="setFocus('method')"
+                  (blur)="clearFocus('method')"
+                  placeholder=" "
+                />
+                <label for="method">Method</label>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="grid-2 mt-16">
+          @if (testModel.resultType === 'Numeric') {
+            <div class="form-group">
+              <div class="floating-input-wrapper" [class.focused]="focus['referenceRange']">
+                <mat-icon class="input-icon">compare_arrows</mat-icon>
+                <input
+                  type="text"
+                  id="referenceRange"
+                  name="referenceRange"
+                  [(ngModel)]="testModel.referenceRange"
+                  (focus)="setFocus('referenceRange')"
+                  (blur)="clearFocus('referenceRange')"
+                  placeholder=" "
+                />
+                <label for="referenceRange">Reference Range</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="floating-input-wrapper" [class.focused]="focus['method']">
+                <mat-icon class="input-icon">psychology</mat-icon>
+                <input
+                  type="text"
+                  id="method"
+                  name="method"
+                  [(ngModel)]="testModel.method"
+                  (focus)="setFocus('method')"
+                  (blur)="clearFocus('method')"
+                  placeholder=" "
+                />
+                <label for="method">Method</label>
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (testModel.resultType !== 'Multi Parameter') {
+          <div class="form-group mt-16" [class.grid-2-span-1]="testModel.resultType !== 'Numeric'">
+            <div class="floating-input-wrapper" [class.focused]="focus['turnaroundTime']">
+              <mat-icon class="input-icon">timer</mat-icon>
+              <input
+                type="text"
+                id="turnaroundTime"
+                name="turnaroundTime"
+                [(ngModel)]="testModel.turnaroundTime"
+                (focus)="setFocus('turnaroundTime')"
+                (blur)="clearFocus('turnaroundTime')"
+                placeholder=" "
+              />
+              <label for="turnaroundTime">Turnaround Time</label>
+            </div>
+          </div>
+        }
+
+        <!-- Section 4: Parameters (Dynamic Table) -->
+        @if (
+          testModel.resultType === 'Multi Parameter' || testModel.resultType === 'Positive/Negative'
+        ) {
+          <section class="form-section">
+            <div class="section-header flex-between">
+              <div class="flex align-center gap-8">
+                <mat-icon>list_alt</mat-icon>
+                <h3>
+                  {{
+                    testModel.resultType === 'Positive/Negative'
+                      ? 'Result Parameters'
+                      : 'Multi Parameter Test'
+                  }}
+                </h3>
+              </div>
+              <button
+                type="button"
+                class="btn btn-secondary btn-sm"
+                (click)="$event.preventDefault(); addParameter()"
+              >
+                <mat-icon>add</mat-icon> Add Parameter
+              </button>
+            </div>
+
+            <div class="parameter-table-container mt-16 scrollable-x">
+              <table class="compact-table">
+                <thead>
+                  <tr>
+                    <th>Parameter Name</th>
+                    <th>Unit</th>
+                    <th>Ref. Range</th>
+                    <th width="180">Type</th>
+                    <th width="50"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (param of testModel.parameters; track param; let i = $index) {
+                    <tr>
+                      <td>
+                        <input
+                          type="text"
+                          [(ngModel)]="param.name"
+                          name="p-name-{{ i }}"
+                          placeholder="e.g. Hemoglobin"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          [(ngModel)]="param.unit"
+                          name="p-unit-{{ i }}"
+                          placeholder="g/dL"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          [(ngModel)]="param.referenceRange"
+                          name="p-ref-{{ i }}"
+                          placeholder="12-16"
+                        />
+                      </td>
+                      <td class="mat-select-cell">
+                        <mat-select
+                          [(ngModel)]="param.resultType"
+                          name="p-type-{{ i }}"
+                          panelClass="custom-select-panel"
+                        >
+                          <mat-option value="Numeric">Numeric</mat-option>
+                          <mat-option value="Text">Text</mat-option>
+                          <mat-option value="Positive/Negative">Pos/Neg</mat-option>
+                        </mat-select>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          class="icon-btn text-danger action-btn"
+                          (click)="removeParameter(i)"
+                          matTooltip="Remove"
+                        >
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                  @if (testModel.parameters.length === 0) {
+                    <tr>
+                      <td colspan="5" class="text-center p-16 text-muted">
+                        No parameters added yet. Click "Add Parameter" to start.
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+        }
+      </section>
+
+      <!-- Section 3: Patient Instructions -->
+      <section class="form-section">
+        <div class="section-header">
+          <mat-icon>menu_book</mat-icon>
+          <h3>Patient Instructions</h3>
+        </div>
+
+        <div class="form-group mt-16">
+          <div class="status-toggle-container">
+            <span class="toggle-label">Fasting Required</span>
+            <div class="segmented-control" style="max-width: 200px">
+              <button
+                type="button"
+                [class.active]="testModel.fastingRequired === true"
+                (click)="testModel.fastingRequired = true"
+              >
+                Yes
+              </button>
+              <button
+                type="button"
+                [class.active]="testModel.fastingRequired === false"
+                (click)="testModel.fastingRequired = false"
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group mt-16">
+          <div class="floating-input-wrapper textarea-wrapper" [class.focused]="focus['prepNotes']">
+            <mat-icon class="input-icon">note_add</mat-icon>
+            <textarea
+              id="prepNotes"
+              name="preparationNotes"
+              [(ngModel)]="testModel.preparationNotes"
+              (focus)="setFocus('prepNotes')"
+              (blur)="clearFocus('prepNotes')"
+              placeholder=" "
+              rows="3"
+            ></textarea>
+            <label for="prepNotes">Preparation Notes</label>
+          </div>
+        </div>
+
+        <div class="form-group mt-16">
+          <div
+            class="floating-input-wrapper textarea-wrapper"
+            [class.focused]="focus['description']"
+          >
+            <mat-icon class="input-icon">description</mat-icon>
+            <textarea
+              id="description"
+              name="description"
+              [(ngModel)]="testModel.description"
+              (focus)="setFocus('description')"
+              (blur)="clearFocus('description')"
+              placeholder=" "
+              rows="3"
+            ></textarea>
+            <label for="description">Description</label>
+          </div>
+        </div>
+      </section>
+    </form>
+  </div>
+
+  <div class="panel-footer">
+    <button type="button" class="btn btn-secondary" (click)="closePanel()">Cancel</button>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="isSubmitting || (editMode && !hasChanges()) || !formValid()"
+      (click)="saveTest()"
+    >
+      @if (isSubmitting) {
+        <mat-icon class="spinner">autorenew</mat-icon> Saving...
+      } @else {
+        <mat-icon>check_circle</mat-icon> {{ editMode ? 'Save Changes' : 'Create Test' }}
+      }
+    </button>
+  </div>
+</div>

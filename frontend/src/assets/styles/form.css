@@ -165,7 +165,9 @@ html.dark .floating-input-wrapper.focused {
   color: var(--primary);
 }
 
-.floating-input-wrapper input, .floating-input-wrapper mat-select {
+.floating-input-wrapper input,
+.floating-input-wrapper mat-select,
+.floating-input-wrapper textarea {
   width: 100%;
   padding: 24px 34px 8px 44px;
   border: none;
@@ -175,6 +177,24 @@ html.dark .floating-input-wrapper.focused {
   outline: none;
   box-shadow: none;
   font-family: inherit;
+}
+
+.floating-input-wrapper textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+.floating-input-wrapper.textarea-wrapper {
+  align-items: flex-start;
+}
+
+.floating-input-wrapper.textarea-wrapper .input-icon {
+  top: 26px;
+}
+
+.floating-input-wrapper.textarea-wrapper label {
+  top: 26px;
 }
 
 .floating-input-wrapper label {
@@ -188,8 +208,10 @@ html.dark .floating-input-wrapper.focused {
   pointer-events: none;
 }
 
-.floating-input-wrapper input:focus~label,
-.floating-input-wrapper input:not(:placeholder-shown)~label,
+.floating-input-wrapper input:focus ~ label,
+.floating-input-wrapper input:not(:placeholder-shown) ~ label,
+.floating-input-wrapper textarea:focus ~ label,
+.floating-input-wrapper textarea:not(:placeholder-shown) ~ label,
 .floating-input-wrapper label.floated {
   top: 14px;
   font-size: 0.72rem;
@@ -198,11 +220,12 @@ html.dark .floating-input-wrapper.focused {
   letter-spacing: 0.02em;
 }
 
-.floating-input-wrapper input:not(:placeholder-shown):not(:focus)~label {
+.floating-input-wrapper input:not(:placeholder-shown):not(:focus) ~ label,
+.floating-input-wrapper textarea:not(:placeholder-shown):not(:focus) ~ label {
   color: var(--text-secondary);
 }
 
-.floating-input-wrapper mat-select:not(.mat-mdc-select-focused)~label.floated {
+.floating-input-wrapper mat-select:not(.mat-mdc-select-focused) ~ label.floated {
   color: var(--text-secondary);
 }
 
@@ -227,16 +250,36 @@ html.dark .floating-input-wrapper.focused {
   background: var(--bg-main) !important;
 }
 
-::ng-deep .custom-select-panel .mat-mdc-option.mdc-list-item--selected .mdc-list-item__primary-text {
+::ng-deep
+  .custom-select-panel
+  .mat-mdc-option.mdc-list-item--selected
+  .mdc-list-item__primary-text {
   color: var(--primary) !important;
   font-weight: 600 !important;
 }
 
-.flex { display: flex; }
-.flex-col { display: flex; flex-direction: column; }
-.gap-24 { gap: 24px; }
-.align-center { align-items: center; }
-.gap-12 { gap: 12px; }
+.flex {
+  display: flex;
+}
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+.gap-24 {
+  gap: 24px;
+}
+.align-center {
+  align-items: center;
+}
+.gap-12 {
+  gap: 12px;
+}
 
-@keyframes spinner { to { transform: rotate(360deg); } }
-.spinner { animation: spinner 1s linear infinite; }
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spinner {
+  animation: spinner 1s linear infinite;
+}

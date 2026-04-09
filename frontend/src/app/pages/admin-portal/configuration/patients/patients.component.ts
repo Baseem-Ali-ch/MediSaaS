@@ -95,7 +95,7 @@ export class PatientsComponent implements OnInit {
   getPatientsList() {
     this.loaderService.show();
     this.httpService
-      .get('/patients')
+      .get('/shared/patients')
       .pipe(
         finalize(() => {
           this.loaderService.hide();
@@ -222,7 +222,7 @@ export class PatientsComponent implements OnInit {
       if (result) {
         this.loaderService.show();
         this.httpService
-          .delete(`/patients/${patient.id}`)
+          .delete(`/shared/patients/${patient.id}`)
           .pipe(
             finalize(() => {
               this.loaderService.hide();
@@ -316,7 +316,7 @@ export class PatientsComponent implements OnInit {
 
     if (this.editMode) {
       this.httpService
-        .put(`/patients/${this.patientModel.id}`, patientDTO)
+        .put(`/shared/patients/${this.patientModel.id}`, patientDTO)
         .pipe(
           finalize(() => {
             this.isSubmitting = false;
@@ -343,7 +343,7 @@ export class PatientsComponent implements OnInit {
         });
     } else {
       this.httpService
-        .post('/patients', patientDTO)
+        .post('/shared/patients', patientDTO)
         .pipe(
           finalize(() => {
             this.isSubmitting = false;

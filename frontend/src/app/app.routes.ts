@@ -24,7 +24,7 @@ export const routes: Routes = [
 
   {
     path: 'auth',
-    //canActivate: [authRedirectGuard],
+    canActivate: [authRedirectGuard],
     children: [
       { path: '', redirectTo: 'login', pathMatch: 'full' },
       { path: 'login', component: LoginPage },
@@ -38,8 +38,8 @@ export const routes: Routes = [
   {
     path: ':role',
     component: AdminLayoutComponent,
-    //canMatch: [roleMatchGuard],
-    //canActivate: [authGuard, roleGuard],
+    canMatch: [roleMatchGuard],
+    canActivate: [authGuard, roleGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent },
@@ -74,6 +74,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/admin-portal/configuration/patients/patients.component').then(
             (m) => m.PatientsComponent,
+          ),
+      },
+      {
+        path: 'test-management',
+        loadComponent: () =>
+          import('./pages/admin-portal/configuration/tests/tests-management.component').then(
+            (m) => m.TestsManagementComponent,
           ),
       },
       { path: '**', redirectTo: '/404' },

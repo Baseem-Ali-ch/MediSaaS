@@ -70,7 +70,7 @@ export class ProfileComponent implements OnInit {
   getProfileData() {
     this.loaderService.show();
     this.httpService
-      .get('/admin/profile')
+      .get('/owner/profile')
       .pipe(
         finalize(() => {
           this.loaderService.hide();
@@ -178,7 +178,7 @@ export class ProfileComponent implements OnInit {
 
     this.isSavingProfile = true;
     this.httpService
-      .patch('/admin/profile', this.formModel)
+      .patch('/owner/profile', this.formModel)
       .pipe(
         finalize(() => {
           this.isSavingProfile = false;
@@ -239,7 +239,7 @@ export class ProfileComponent implements OnInit {
 
     this.isUpdatingPassword = true;
     this.httpService
-      .patch('/admin/profile', this.passModel)
+      .patch('/owner/profile', this.passModel)
       .pipe(
         finalize(() => {
           this.isUpdatingPassword = false;

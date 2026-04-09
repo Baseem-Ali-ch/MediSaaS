@@ -90,7 +90,7 @@ export class StaffManagementComponent implements OnInit {
   getStaffList() {
     this.loaderService.show();
     this.httpService
-      .get('/admin/staff')
+      .get('/owner/staff')
       .pipe(
         finalize(() => {
           this.loaderService.hide();
@@ -109,7 +109,7 @@ export class StaffManagementComponent implements OnInit {
 
   getBranchList() {
     this.httpService
-      .get('/admin/branch')
+      .get('/owner/branch')
       .pipe(
         finalize(() => {
           this.loaderService.hide();
@@ -199,6 +199,7 @@ export class StaffManagementComponent implements OnInit {
   openStaffDetails(staff: StaffData) {
     this.dialog.open(StaffDetailsPopupComponent, {
       width: '550px',
+      panelClass: 'sharp-dialog',
       data: { staff },
     });
   }
@@ -206,12 +207,12 @@ export class StaffManagementComponent implements OnInit {
   deleteStaff(staff: StaffData) {
     const dialogRef = this.dialog.open(ConfirmationPopupComponent, {
       width: '400px',
+      panelClass: 'sharp-dialog',
       data: {
+        type: 'error',
         title: 'Delete Staff Member',
         message: `Are you sure you want to remove <b>${staff.name}</b> from the system?`,
         confirmText: 'Delete',
-        cancelText: 'Cancel',
-        isDestructive: true,
       },
     });
 
@@ -224,7 +225,7 @@ export class StaffManagementComponent implements OnInit {
       )
       .subscribe((result) => {
         if (result) {
-          this.httpService.delete(`/admin/branch/${staff.id}`).subscribe({
+          this.httpService.delete(`/owner/branch/${staff.id}`).subscribe({
             next: () => {
               this.staffList = this.staffList.filter((b) => b.id !== staff.id);
               this.toastService.show('Staff deleted successfully');
@@ -243,7 +244,7 @@ export class StaffManagementComponent implements OnInit {
 
     if (this.editMode) {
       this.httpService
-        .patch(`/admin/staff/${this.staffModel.id}`, this.staffModel)
+        .patch(`/owner/staff/${this.staffModel.id}`, this.staffModel)
         .pipe(
           finalize(() => {
             this.isSubmitting = false;
@@ -272,7 +273,7 @@ export class StaffManagementComponent implements OnInit {
         });
     } else {
       this.httpService
-        .post('/admin/staff', this.staffModel)
+        .post('/owner/staff', this.staffModel)
         .pipe(
           finalize(() => {
             this.isSubmitting = false;

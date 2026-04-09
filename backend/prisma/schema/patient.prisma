@@ -1,27 +1,27 @@
 model Patient {
-    id               Int       @id @default(autoincrement())
-    refId            String?
-    name             String
-    phone            String
-    gender           String? // MALE, FEMALE, OTHER
-    dateOfBirth      DateTime?
-    age              Int?
-    address          String?
-    bloodGroup       String? // A+, A-, B+, B-, AB+, AB-, O+, O-
-    emergencyContact String?
-    notes            String?
-    status           String?   @default("ACTIVE") // ACTIVE, INACTIVE, SUSPENDED
-    isPhoneVerified  Boolean   @default(false)
-    otp              String?
-    otpExpires       DateTime?
-    createdAt        DateTime  @default(now())
-    updatedAt        DateTime  @updatedAt
+  id               Int       @id @default(autoincrement())
+  refId            String?
+  name             String
+  phone            String
+  gender           String? // MALE, FEMALE, OTHER
+  dateOfBirth      DateTime?
+  age              Int?
+  address          String?
+  bloodGroup       String? // A+, A-, B+, B-, AB+, AB-, O+, O-
+  emergencyContact String?
+  notes            String?
+  status           String?   @default("ACTIVE") // ACTIVE, INACTIVE, SUSPENDED
+  isPhoneVerified  Boolean   @default(false)
+  otp              String?
+  otpExpires       DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
-    labId Int
-    lab   Lab @relation(fields: [labId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  labId Int
+  lab   Lab @relation(fields: [labId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-    branchId Int?
-    branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  branchId Int?
+  branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
-    activityLogs ActivityLog[]
+  activityLogs ActivityLog[]
 }

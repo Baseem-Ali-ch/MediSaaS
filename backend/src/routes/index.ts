@@ -1,12 +1,12 @@
-import { Router } from 'express'
-import authRoutes from './auth.routes'
-import adminRoutes from './owner.routes'
-import patientRoutes from './patient.routes'
+import { Router } from "express";
+import authRoutes from "./auth.routes";
+import ownerRoutes from "./owner.routes";
+import sharedRoutes from "./shared.routes";
 
-const router = Router()
+const router = Router();
 
-router.use('/auth', authRoutes)
-router.use('/admin', adminRoutes)
-router.use('/patients', patientRoutes)
+router.use("/auth", authRoutes);
+router.use("/owner", ownerRoutes);
+router.use("/shared", sharedRoutes);
 
-export default router
+export default router;

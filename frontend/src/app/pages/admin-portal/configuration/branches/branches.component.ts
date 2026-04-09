@@ -61,7 +61,7 @@ export class BranchesComponent implements OnInit {
   getBranchList() {
     this.loaderService.show();
     this.httpService
-      .get('/admin/branch')
+      .get('/owner/branch')
       .pipe(
         finalize(() => {
           this.loaderService.hide();
@@ -192,7 +192,7 @@ export class BranchesComponent implements OnInit {
 
     if (this.editMode) {
       this.httpService
-        .patch(`/admin/branch/${this.branchModel.id}`, this.branchModel)
+        .patch(`/owner/branch/${this.branchModel.id}`, this.branchModel)
         .pipe(
           finalize(() => {
             this.isSubmitting = false;
@@ -218,7 +218,7 @@ export class BranchesComponent implements OnInit {
         });
     } else {
       this.httpService
-        .post('/admin/branch', this.branchModel)
+        .post('/owner/branch', this.branchModel)
         .pipe(
           finalize(() => {
             this.isSubmitting = false;
@@ -267,7 +267,7 @@ export class BranchesComponent implements OnInit {
       )
       .subscribe((result) => {
         if (result) {
-          this.httpService.delete(`/admin/branch/${branch.id}`).subscribe({
+          this.httpService.delete(`/owner/branch/${branch.id}`).subscribe({
             next: () => {
               this.branches = this.branches.filter((b) => b.id !== branch.id);
               this.toastService.show('Branch deleted successfully');

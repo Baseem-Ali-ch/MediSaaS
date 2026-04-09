@@ -97,6 +97,7 @@ export class SidebarComponent implements OnInit {
           },
           { label: 'Branch Management', route: `${p}/branch-management` },
           { label: 'Staff Management', route: `${p}/staff-management` },
+          { label: 'Test Management', route: `${p}/test-management` },
         ],
       },
     ];

@@ -13,8 +13,9 @@ model Lab {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  users    User[]
-  branches Branch[]
+  users        User[]
+  branches     Branch[]
   activityLogs ActivityLog[]
-  patients Patient[]
+  patients     Patient[]
+  tests        Test[]
 }

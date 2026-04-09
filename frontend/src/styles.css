@@ -87,12 +87,18 @@ html {
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
   background-color: var(--bg-main);
   color: var(--text-primary);
   line-height: 1.5;
   /* Sharper line-height */
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
   letter-spacing: -0.01em;
   /* Modern typography feel */
 }
@@ -352,8 +358,6 @@ html.dark select:focus {
   }
 }
 
-
-
 /* Badges & Tags */
 .badge {
   display: inline-flex;
@@ -450,7 +454,6 @@ html.dark .badge {
 }
 
 @media (max-width: 1024px) {
-
   .grid-3,
   .grid-4 {
     grid-template-columns: repeat(2, 1fr);
@@ -458,7 +461,6 @@ html.dark .badge {
 }
 
 @media (max-width: 768px) {
-
   .grid-2,
   .grid-3,
   .grid-4 {
@@ -476,12 +478,12 @@ html.dark .badge {
 
 /* Material Dialog Sharp Style */
 .sharp-dialog .mat-mdc-dialog-container {
-  --mdc-dialog-container-shape: 8px !important;
+  --mdc-dialog-container-shape: 15px !important;
   --mdc-dialog-container-color: var(--bg-card) !important;
 }
 
 .sharp-dialog .mat-mdc-dialog-surface {
-  border-radius: 8px !important;
+  border-radius: 15px !important;
   background-color: var(--bg-card) !important;
   box-shadow: var(--shadow-lg) !important;
   border: 1px solid var(--border) !important;

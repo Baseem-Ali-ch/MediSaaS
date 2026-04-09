@@ -73,6 +73,7 @@ html.dark .search-box:focus-within {
   flex: 1;
   outline: none;
   color: var(--text-primary);
+  box-shadow: none;
 }
 
 .filter-select { position: relative; display: flex;}
