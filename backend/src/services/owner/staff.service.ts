@@ -61,6 +61,7 @@ export const createStaff = async (
     password: hashedPassword,
     inviteToken: inviteToken,
     inviteTokenExpires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    isTempPassword: true,
   });
 
   await sendInvitationEmail(data.name, data.email, password, inviteToken);

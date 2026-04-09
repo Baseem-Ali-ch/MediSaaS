@@ -1,6 +1,6 @@
 <h2 mat-dialog-title class="dialog-header">
-  <div class="header-icon" [class.destructive]="isDestructive">
-    <mat-icon>{{ isDestructive ? 'warning' : 'help_outline' }}</mat-icon>
+  <div class="header-icon" [ngClass]="type" [class.destructive]="isDestructive">
+    <mat-icon>{{ icon }}</mat-icon>
   </div>
   {{ title }}
 </h2>
@@ -14,7 +14,7 @@
     @if (cancelIcon) { <mat-icon class="btn-inner-icon">{{ cancelIcon }}</mat-icon> }
     {{ cancelText }}
   </button>
-  <button type="button" class="btn btn-primary" [class.btn-danger]="isDestructive" (click)="onConfirm()">
+  <button type="button" class="btn btn-primary" [ngClass]="type" [class.btn-danger]="isDestructive" (click)="onConfirm()">
     @if (confirmIcon) { <mat-icon class="btn-inner-icon">{{ confirmIcon }}</mat-icon> }
     {{ confirmText }}
   </button>

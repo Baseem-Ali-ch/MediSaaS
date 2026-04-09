@@ -16,4 +16,5 @@ model Lab {
   users    User[]
   branches Branch[]
   activityLogs ActivityLog[]
+  patients Patient[]
 }

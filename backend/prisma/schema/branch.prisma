@@ -17,4 +17,5 @@ model Branch {
 
   users User[]
   activityLogs ActivityLog[]
+  patients Patient[]
 }

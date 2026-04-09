@@ -11,6 +11,7 @@ export interface ConfirmationData {
   confirmIcon?: string;
   cancelIcon?: string;
   isDestructive?: boolean;
+  type?: 'success' | 'info' | 'warn' | 'error';
 }
 
 @Component({
@@ -25,21 +26,46 @@ export class ConfirmationPopupComponent {
   message: string;
   confirmText: string;
   cancelText: string;
-  confirmIcon: string;
-  cancelIcon: string;
+  confirmIcon: string = '';
+  cancelIcon: string = '';
   isDestructive: boolean;
+  type: string;
+  icon: string = 'help_outline';
 
   constructor(
     public dialogRef: MatDialogRef<ConfirmationPopupComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ConfirmationData | null
   ) {
-    this.title = data?.title || 'Confirm Action';
+    this.type = data?.type || 'info';
+    this.title = data?.title || this.getDefaultTitle(this.type);
     this.message = data?.message || 'Are you sure you want to proceed?';
     this.confirmText = data?.confirmText || 'Confirm';
     this.cancelText = data?.cancelText || 'Cancel';
     this.confirmIcon = data?.confirmIcon || '';
     this.cancelIcon = data?.cancelIcon || '';
     this.isDestructive = data?.isDestructive || false;
+    this.icon = this.getIconByType(this.type);
+  }
+
+  private getDefaultTitle(type: string): string {
+    switch (type) {
+      case 'success': return 'Success';
+      case 'error': return 'Error';
+      case 'warn': return 'Warning';
+      case 'info': return 'Information';
+      default: return 'Confirm Action';
+    }
+  }
+
+  private getIconByType(type: string): string {
+    if (this.isDestructive) return 'warning';
+    switch (type) {
+      case 'success': return 'check_circle';
+      case 'error': return 'error';
+      case 'warn': return 'warning';
+      case 'info': return 'info';
+      default: return 'help_outline';
+    }
   }
 
   onCancel(): void {

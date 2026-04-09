@@ -1,0 +1,374 @@
+<div class="page-container">
+  <div class="page-header flex-between">
+    <div class="header-title">
+      <h1>Patients Management</h1>
+      <p class="text-muted">Manage your laboratory patients</p>
+    </div>
+    <button class="btn btn-primary" (click)="openAddPanel()">
+      <mat-icon>person_add</mat-icon> Add Patient
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-row">
+    <div class="search-box">
+      <mat-icon>search</mat-icon>
+      <input type="text" [(ngModel)]="searchQuery" placeholder="Search by name, ID or phone..." />
+    </div>
+
+    <div class="filter-select">
+      <mat-select [(ngModel)]="filterGender" class="modern-select" panelClass="custom-select-panel">
+        <mat-option value="All">All Genders</mat-option>
+        <mat-option value="Male">Male</mat-option>
+        <mat-option value="Female">Female</mat-option>
+        <mat-option value="Other">Other</mat-option>
+      </mat-select>
+    </div>
+    @if (searchQuery || filterGender !== 'All') {
+      <button class="btn text-btn" (click)="clearFilters()">Clear Filters</button>
+    }
+  </div>
+
+  <p class="results-count text-muted">
+    Showing {{ getFilteredPatients().length }} of {{ totalFilteredItems }} patients
+  </p>
+
+  <!-- Table Section -->
+  <div class="table-card mt-24">
+    <div class="table-container scrollable-x">
+      <table mat-table [dataSource]="getFilteredPatients()" matSort class="modern-table">
+        <!-- Patient ID -->
+        <ng-container matColumnDef="patientId">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Patient ID</th>
+          <td mat-cell *matCellDef="let patient">
+            <a href="javascript:void(0)" class="id-link" (click)="openPatientDetails(patient)">{{
+              patient.refId
+            }}</a>
+          </td>
+        </ng-container>
+
+        <!-- Name -->
+        <ng-container matColumnDef="fullName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+          <td mat-cell *matCellDef="let patient">
+            <b>{{ patient.name }}</b>
+          </td>
+        </ng-container>
+
+        <!-- Age -->
+        <ng-container matColumnDef="age">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Age</th>
+          <td mat-cell *matCellDef="let patient">{{ patient.age }}</td>
+        </ng-container>
+
+        <!-- Gender -->
+        <ng-container matColumnDef="gender">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Gender</th>
+          <td mat-cell *matCellDef="let patient">
+            <span class="role-badge" [class.admin]="patient.gender === 'Female'">{{
+              patient.gender
+            }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Phone -->
+        <ng-container matColumnDef="phone">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Phone</th>
+          <td mat-cell *matCellDef="let patient">{{ patient.phone }}</td>
+        </ng-container>
+
+        <!-- Blood Group -->
+        <ng-container matColumnDef="bloodGroup">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Blood Group</th>
+          <td mat-cell *matCellDef="let patient">{{ patient.bloodGroup || '—' }}</td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let patient" class="text-right">
+            <button class="action-btn" (click)="openEditPanel(patient)" matTooltip="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              class="action-btn text-danger"
+              (click)="deletePatient(patient)"
+              matTooltip="Delete"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+        <!-- Row shown when there is no matching data. -->
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell p-24 text-center" colspan="7">
+            <div class="empty-state">
+              <mat-icon class="empty-icon">person_off</mat-icon>
+              <h3>No patients found matching the filter "{{ searchQuery }}"</h3>
+              <p>Adjust your search filters or add a new patient.</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <app-pagination
+      [totalItems]="totalFilteredItems"
+      [pageSize]="pageSize"
+      [currentPage]="currentPage"
+      (pageChange)="onPageChange($event)"
+    ></app-pagination>
+  </div>
+</div>
+
+<!-- Slide Over Panel Overlay -->
+<div class="panel-overlay" [class.open]="isPanelOpen" (click)="closePanel()"></div>
+
+<!-- Slide Over Panel (Patient Form) -->
+<div class="slide-panel" [class.open]="isPanelOpen">
+  <div class="panel-header-simple">
+    <div class="panel-title">
+      <mat-icon>{{ editMode ? 'manage_accounts' : 'person_add' }}</mat-icon>
+      <h2>{{ editMode ? 'Edit Patient Details' : 'Add New Patient' }}</h2>
+    </div>
+    <button class="close-btn" (click)="closePanel()"><mat-icon>close</mat-icon></button>
+  </div>
+
+  <div class="panel-body">
+    <form class="clean-form flex-col gap-24" (ngSubmit)="savePatient()">
+      <!-- Full Name -->
+      <div class="form-group">
+        <div
+          class="floating-input-wrapper"
+          [class.focused]="focus['fullName']"
+          [class.edited]="editMode && patientModel.name !== originalModel.name"
+        >
+          <mat-icon class="input-icon">person</mat-icon>
+          <input
+            type="text"
+            id="fullName"
+            name="fullName"
+            [(ngModel)]="patientModel.name"
+            required
+            (focus)="setFocus('fullName')"
+            (blur)="clearFocus('fullName')"
+            placeholder=" "
+          />
+          <label for="fullName">Full Name *</label>
+        </div>
+      </div>
+      <!-- Phone -->
+      <div class="form-group">
+        <div
+          class="floating-input-wrapper"
+          [class.focused]="focus['phone']"
+          [class.edited]="editMode && patientModel.phone !== originalModel.phone"
+        >
+          <mat-icon class="input-icon">phone</mat-icon>
+          <input
+            type="tel"
+            id="phone"
+            name="phone"
+            [(ngModel)]="patientModel.phone"
+            required
+            (focus)="setFocus('phone')"
+            (blur)="clearFocus('phone')"
+            placeholder=" "
+          />
+          <label for="phone">Phone *</label>
+        </div>
+      </div>
+
+      <!-- DOB & Age Grid -->
+      <div class="grid-2">
+        <div class="form-group flex-1">
+          <div
+            class="floating-input-wrapper pointer"
+            [class.focused]="focus['dob'] || picker.opened"
+            [class.edited]="editMode && patientModel.dateOfBirth !== originalModel.dateOfBirth"
+            (click)="picker.open()"
+          >
+            <mat-icon class="input-icon">calendar_today</mat-icon>
+            <input
+              matInput
+              [matDatepicker]="picker"
+              [max]="maxDate"
+              id="dob"
+              name="dob"
+              [(ngModel)]="patientModel.dateOfBirth"
+              (dateChange)="onDateOfBirthChange($event.value)"
+              required
+              readonly
+              (focus)="setFocus('dob')"
+              (blur)="clearFocus('dob')"
+              placeholder=" "
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="picker"
+              class="datepicker-toggle"
+            ></mat-datepicker-toggle>
+            <mat-datepicker
+              #picker
+              (opened)="setFocus('dob')"
+              (closed)="clearFocus('dob')"
+            ></mat-datepicker>
+            <label
+              for="dob"
+              [class.floated]="patientModel.dateOfBirth || focus['dob'] || picker.opened"
+              >Date of Birth *</label
+            >
+          </div>
+        </div>
+
+        <div class="form-group flex-1">
+          <div class="floating-input-wrapper readonly-field">
+            <mat-icon class="input-icon">cake</mat-icon>
+            <input
+              type="text"
+              id="age"
+              name="age"
+              [value]="patientModel.age !== null ? patientModel.age + ' Years' : ''"
+              disabled
+              placeholder=" "
+            />
+            <label
+              for="age"
+              [class.floated]="patientModel.age !== null && patientModel.age !== undefined"
+              >Age</label
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Gender Select -->
+        <div class="form-group mat-select-group">
+          <div class="floating-input-wrapper" [class.focused]="focus['gender']">
+            <mat-icon class="input-icon">wc</mat-icon>
+            <mat-select
+              id="gender"
+              name="gender"
+              [(ngModel)]="patientModel.gender"
+              required
+              (focus)="setFocus('gender')"
+              (blur)="clearFocus('gender')"
+              panelClass="custom-select-panel"
+            >
+              <mat-option value="Male">Male</mat-option>
+              <mat-option value="Female">Female</mat-option>
+              <mat-option value="Other">Other</mat-option>
+            </mat-select>
+            <label for="gender" [class.floated]="true">Gender *</label>
+          </div>
+        </div>
+
+        <!-- Blood Group Select -->
+        <div class="form-group mat-select-group">
+          <div class="floating-input-wrapper" [class.focused]="focus['bloodGroup']">
+            <mat-icon class="input-icon">bloodtype</mat-icon>
+            <mat-select
+              id="bloodGroup"
+              name="bloodGroup"
+              [(ngModel)]="patientModel.bloodGroup"
+              (focus)="setFocus('bloodGroup')"
+              (blur)="clearFocus('bloodGroup')"
+              panelClass="custom-select-panel"
+            >
+              <mat-option value="A+">A+</mat-option>
+              <mat-option value="A-">A-</mat-option>
+              <mat-option value="B+">B+</mat-option>
+              <mat-option value="B-">B-</mat-option>
+              <mat-option value="AB+">AB+</mat-option>
+              <mat-option value="AB-">AB-</mat-option>
+              <mat-option value="O+">O+</mat-option>
+              <mat-option value="O-">O-</mat-option>
+            </mat-select>
+            <label for="bloodGroup" [class.floated]="true">Blood Group</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div
+          class="floating-input-wrapper"
+          [class.focused]="focus['address']"
+          [class.edited]="editMode && patientModel.address !== originalModel.address"
+        >
+          <mat-icon class="input-icon">home</mat-icon>
+          <input
+            type="text"
+            id="address"
+            name="address"
+            [(ngModel)]="patientModel.address"
+            (focus)="setFocus('address')"
+            (blur)="clearFocus('address')"
+            placeholder=" "
+          />
+          <label for="address" [class.floated]="patientModel.address || focus['address']"
+            >Address</label
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div
+          class="floating-input-wrapper"
+          [class.focused]="focus['emergencyContact']"
+          [class.edited]="
+            editMode && patientModel.emergencyContact !== originalModel.emergencyContact
+          "
+        >
+          <mat-icon class="input-icon">contact_emergency</mat-icon>
+          <input
+            type="text"
+            id="emergencyContact"
+            name="emergencyContact"
+            [(ngModel)]="patientModel.emergencyContact"
+            (focus)="setFocus('emergencyContact')"
+            (blur)="clearFocus('emergencyContact')"
+            placeholder=" "
+          />
+          <label for="emergencyContact">Emergency Contact</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div
+          class="floating-input-wrapper"
+          [class.focused]="focus['notes']"
+          [class.edited]="editMode && patientModel.notes !== originalModel.notes"
+        >
+          <mat-icon class="input-icon">note</mat-icon>
+          <input
+            type="text"
+            id="notes"
+            name="notes"
+            [(ngModel)]="patientModel.notes"
+            (focus)="setFocus('notes')"
+            (blur)="clearFocus('notes')"
+            placeholder=" "
+          />
+          <label for="notes" [class.floated]="patientModel.notes || focus['notes']">Notes</label>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="panel-footer">
+    <button type="button" class="btn btn-secondary" (click)="closePanel()">Cancel</button>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="(editMode && !hasChanges()) || !formValid()"
+      (click)="savePatient()"
+    >
+      <mat-icon>check_circle</mat-icon> {{ editMode ? 'Save Changes' : 'Create Patient' }}
+    </button>
+  </div>
+</div>

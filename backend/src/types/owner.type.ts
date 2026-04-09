@@ -7,5 +7,5 @@ export type CreateStaffInput = {
   photo?: string;
   branchId?: number;
   status: string;
-//   password: string
+  isTempPassword?: boolean;
 };

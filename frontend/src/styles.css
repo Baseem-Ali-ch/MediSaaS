@@ -473,3 +473,21 @@ html.dark .badge {
     font-size: 1.5rem;
   }
 }
+
+/* Material Dialog Sharp Style */
+.sharp-dialog .mat-mdc-dialog-container {
+  --mdc-dialog-container-shape: 8px !important;
+  --mdc-dialog-container-color: var(--bg-card) !important;
+}
+
+.sharp-dialog .mat-mdc-dialog-surface {
+  border-radius: 8px !important;
+  background-color: var(--bg-card) !important;
+  box-shadow: var(--shadow-lg) !important;
+  border: 1px solid var(--border) !important;
+}
+
+html.dark .sharp-dialog .mat-mdc-dialog-surface {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}

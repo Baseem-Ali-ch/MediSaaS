@@ -16,6 +16,7 @@ model User {
   inviteTokenExpires       DateTime?
   jwtToken                 String?
   jwtTokenExpires          DateTime?
+  isTempPassword           Boolean   @default(false)
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
 

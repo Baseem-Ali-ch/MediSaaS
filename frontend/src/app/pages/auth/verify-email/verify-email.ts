@@ -80,6 +80,7 @@ export class VerifyEmailPage implements OnInit {
           if (res.success) {
             this.tokenService.setTokens(res.data.token.accessToken, res.data.token.refreshToken);
             localStorage.setItem('role', res.data.user.role.toLowerCase());
+            localStorage.setItem('is-temp-password', res.data.user.isTempPassword.toString());
             this.router.navigate([`/${res.data.user.role.toLowerCase()}/dashboard`]);
           } else {
             this.snack.open(res.message, 'OK', { duration: 3000 });

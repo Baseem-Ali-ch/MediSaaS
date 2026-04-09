@@ -249,6 +249,8 @@ export class ProfileComponent implements OnInit {
         next: (res) => {
           this.discardPasswordChanges();
           this.showToast('Password securely updated.');
+          localStorage.setItem('is-temp-password', 'false');
+          sessionStorage.removeItem('temp-password-alert-shown');
         },
         error: (err) => {
           this.showToast('Failed to update.');

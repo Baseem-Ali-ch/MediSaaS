@@ -24,7 +24,7 @@ export const routes: Routes = [
 
   {
     path: 'auth',
-    canActivate: [authRedirectGuard],
+    //canActivate: [authRedirectGuard],
     children: [
       { path: '', redirectTo: 'login', pathMatch: 'full' },
       { path: 'login', component: LoginPage },
@@ -38,8 +38,8 @@ export const routes: Routes = [
   {
     path: ':role',
     component: AdminLayoutComponent,
-    canMatch: [roleMatchGuard],
-    canActivate: [authGuard, roleGuard],
+    //canMatch: [roleMatchGuard],
+    //canActivate: [authGuard, roleGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent },
@@ -51,7 +51,7 @@ export const routes: Routes = [
       {
         path: 'lab-management',
         loadComponent: () =>
-          import('./pages/admin-portal/configuration/lab-management/lab-management.component').then(
+          import('./pages/admin-portal/configuration/lab/lab-management.component').then(
             (m) => m.LabManagementComponent,
           ),
       },
@@ -65,8 +65,15 @@ export const routes: Routes = [
       {
         path: 'staff-management',
         loadComponent: () =>
-          import('./pages/admin-portal/configuration/staff-management/staff-management.component').then(
+          import('./pages/admin-portal/configuration/staff/staff-management.component').then(
             (m) => m.StaffManagementComponent,
+          ),
+      },
+      {
+        path: 'patients',
+        loadComponent: () =>
+          import('./pages/admin-portal/configuration/patients/patients.component').then(
+            (m) => m.PatientsComponent,
           ),
       },
       { path: '**', redirectTo: '/404' },

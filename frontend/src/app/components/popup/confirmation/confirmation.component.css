@@ -2,40 +2,39 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  margin: 0 0 16px 0 !important;
+  margin: 0 !important;
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
-  /* override native material title padding if needed */
-  padding: 24px 24px 0 24px !important; 
+  padding: 24px 24px 16px 24px !important;
+  background: var(--bg-card);
 }
 
 .header-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: rgba(26, 122, 60, 0.1);
-  color: var(--primary);
-  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
   flex-shrink: 0;
-}
-html.dark .header-icon {
-  background: rgba(34, 197, 94, 0.1);
+  background: var(--bg-main);
+  transition: var(--transition-fast);
 }
 
-.header-icon.destructive {
-  background: rgba(220, 38, 38, 0.1);
-  color: var(--danger);
-}
+/* Type specific header icons - Using slightly more visible opacity for dark theme */
+.header-icon.success { background: rgba(34, 197, 94, 0.15); color: var(--success); }
+.header-icon.info { background: rgba(56, 189, 248, 0.15); color: var(--info); }
+.header-icon.warn { background: rgba(234, 179, 8, 0.15); color: var(--warning); }
+.header-icon.error, .header-icon.destructive { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
 
 .dialog-body {
   margin: 0;
   color: var(--text-secondary);
   font-size: 0.95rem;
-  line-height: 1.5;
+  line-height: 1.6;
   padding: 0 24px 24px 24px !important;
+  background: var(--bg-card);
 }
 
 .dialog-body p {
@@ -47,13 +46,25 @@ html.dark .header-icon {
   padding: 16px 24px !important;
   border-top: 1px solid var(--border);
   margin: 0 !important;
+  background: var(--bg-main);
 }
 
-.btn-danger {
-  background-color: var(--danger) !important;
-  color: white !important;
-  border: 1px solid rgba(0,0,0,0.1) !important;
-}
-.btn-danger:hover {
-  background-color: #b91c1c !important; 
+/* Button overrides for different types */
+.btn-primary.success { background: var(--success) !important; color: white !important; }
+.btn-primary.success:hover { filter: brightness(1.1); }
+
+.btn-primary.warn { background: var(--warning) !important; color: white !important; }
+.btn-primary.warn:hover { filter: brightness(1.1); }
+
+.btn-primary.error, .btn-primary.btn-danger { background: var(--danger) !important; color: white !important; }
+.btn-primary.error:hover, .btn-primary.btn-danger:hover { filter: brightness(1.1); }
+
+.btn-primary.info { background: var(--info) !important; color: white !important; }
+.btn-primary.info:hover { filter: brightness(1.1); }
+
+.btn-inner-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
 }
