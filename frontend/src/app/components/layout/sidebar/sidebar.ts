@@ -52,6 +52,12 @@ export class SidebarComponent implements OnInit {
         roles: ['admin', 'owner', 'staff'],
       },
       {
+        label: 'Bookings',
+        route: `${p}/bookings`,
+        icon: 'shopping_cart',
+        roles: ['admin', 'owner', 'staff'],
+      },
+      {
         label: 'Diagnostics',
         icon: 'science',
         expanded: false,

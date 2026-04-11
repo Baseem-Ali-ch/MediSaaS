@@ -18,12 +18,10 @@ export const getTests = async (req: any, res: Response) => {
     });
   } catch (error: any) {
     logger.error("[Controller] Error fetching tests:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: error.message || "Failed to fetch tests",
-      });
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to fetch tests",
+    });
   }
 };
 
@@ -43,12 +41,10 @@ export const getTestById = async (req: any, res: Response) => {
     });
   } catch (error: any) {
     logger.error("[Controller] Error fetching test:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: error.message || "Failed to fetch test",
-      });
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to fetch test",
+    });
   }
 };
 
@@ -71,12 +67,10 @@ export const createTest = async (req: any, res: Response) => {
     });
   } catch (error: any) {
     logger.error("[Controller] Error creating test:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: error.message || "Failed to create test",
-      });
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to create test",
+    });
   }
 };
 
@@ -100,12 +94,10 @@ export const updateTest = async (req: any, res: Response) => {
     });
   } catch (error: any) {
     logger.error("[Controller] Error updating test:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: error.message || "Failed to update test",
-      });
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to update test",
+    });
   }
 };
 
@@ -128,11 +120,9 @@ export const deleteTest = async (req: any, res: Response) => {
     });
   } catch (error: any) {
     logger.error("[Controller] Error deleting test:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: error.message || "Failed to delete test",
-      });
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to delete test",
+    });
   }
 };

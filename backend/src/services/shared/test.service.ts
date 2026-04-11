@@ -4,6 +4,11 @@ import { TestRepository } from "../../repositories/test.repository";
 import { UserRepository } from "../../repositories/user.repository";
 import { BranchRepository } from "../../repositories/branch.repository";
 import { CreateTestDTO, UpdateTestDTO } from "../../dtos/test.dto";
+import {
+  MapCreateTest,
+  MapTestToDTO,
+  MapUpdateTest,
+} from "../../mappers/test.mapper";
 
 const testRepo = new TestRepository(prisma);
 const userRepo = new UserRepository(prisma);
@@ -13,7 +18,8 @@ export const getTests = async (userId: number) => {
   const user = await userRepo.findById(userId);
   if (!user) throw new Error("User not found");
 
-  return testRepo.getTests(user.labId!);
+  const tests = await testRepo.getTests(user.labId!);
+  return tests.map(MapTestToDTO);
 };
 
 export const getTestById = async (userId: number, testId: number) => {
@@ -21,30 +27,23 @@ export const getTestById = async (userId: number, testId: number) => {
   if (!user) throw new Error("User not found");
 
   const test = await testRepo.findById(testId);
-  if (!test || test.labId !== user.labId)
-    throw new Error("Test not found");
+  if (!test || test.labId !== user.labId) throw new Error("Test not found");
 
-  return test;
+  return MapTestToDTO(test);
 };
 
 export const createTest = async (
   userId: number,
   data: CreateTestDTO,
-  ipAddress: string | null
+  ipAddress: string | null,
 ) => {
   const user = await userRepo.findById(userId);
   if (!user) throw new Error("User not found");
 
-  const dataToCreate: any = { ...data };
-  
-  if (dataToCreate.parameters) {
-    dataToCreate.parameters = JSON.stringify(dataToCreate.parameters);
-  } else {
-    dataToCreate.parameters = JSON.stringify([]);
-  }
+  const mappedData = MapCreateTest(data);
 
   const test = await testRepo.create({
-    ...dataToCreate,
+    ...mappedData,
     lab: { connect: { id: user.labId } },
     ...(user.branchId && { branch: { connect: { id: user.branchId } } }),
   } as any);
@@ -62,29 +61,25 @@ export const createTest = async (
     },
   });
 
-  return test;
+  return MapTestToDTO(test);
 };
 
 export const updateTest = async (
   userId: number,
   testId: number,
   data: UpdateTestDTO,
-  ipAddress: string | null
+  ipAddress: string | null,
 ) => {
   const user = await userRepo.findById(userId);
   if (!user) throw new Error("User not found");
 
   const test = await testRepo.findById(testId);
-  if (!test || test.labId !== user.labId)
-    throw new Error("Test not found");
+  if (!test || test.labId !== user.labId) throw new Error("Test not found");
 
-  const dataToUpdate: any = { ...data };
-  
-  if (dataToUpdate.parameters) {
-    dataToUpdate.parameters = JSON.stringify(dataToUpdate.parameters);
-  }
+  const mappedData = MapUpdateTest(data);
 
-  const updatedTest = await testRepo.update(testId, dataToUpdate);
+  const updatedTest = await testRepo.update(testId, mappedData);
+  if (!updatedTest) throw new Error("Failed to update test");
 
   await logActivity({
     performedById: user.id!,
@@ -99,24 +94,24 @@ export const updateTest = async (
     },
   });
 
-  return updatedTest;
+  return MapTestToDTO(updatedTest);
 };
 
 export const deleteTest = async (
   userId: number,
   testId: number,
-  ipAddress: string | null
+  ipAddress: string | null,
 ) => {
   const user = await userRepo.findById(userId);
   if (!user) throw new Error("User not found");
 
   const test = await testRepo.findById(testId);
-  if (!test || test.labId !== user.labId)
-    throw new Error("Test not found");
+  if (!test || test.labId !== user.labId) throw new Error("Test not found");
 
   const updatedTest = await testRepo.update(testId, {
     status: "SUSPENDED",
   });
+  if (!updatedTest) throw new Error("Failed to suspend test");
 
   await logActivity({
     performedById: user.id!,
@@ -131,5 +126,6 @@ export const deleteTest = async (
     },
   });
 
-  return updatedTest;
+  return MapTestToDTO(updatedTest);
 };
+

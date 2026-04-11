@@ -18,4 +18,5 @@ model Lab {
   activityLogs ActivityLog[]
   patients     Patient[]
   tests        Test[]
+  bookings     Booking[]
 }

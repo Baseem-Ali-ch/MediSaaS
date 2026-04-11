@@ -14,7 +14,7 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
     return this.model.create({ data });
   }
 
-  async findById(id: number): Promise<T | null> {
+  async findById(id: number | string): Promise<T | null> {
     return this.model.findUnique({ where: { id } });
   }
 
@@ -22,11 +22,12 @@ export abstract class BaseRepository<T, CreateInput, UpdateInput> {
     return this.model.findMany();
   }
 
-  async update(id: number, data: UpdateInput): Promise<T | null> {
+  async update(id: number | string, data: UpdateInput): Promise<T | null> {
     return this.model.update({ where: { id }, data });
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: number | string): Promise<void> {
     await this.model.delete({ where: { id } });
   }
+
 }

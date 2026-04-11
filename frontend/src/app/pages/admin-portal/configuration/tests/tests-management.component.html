@@ -29,7 +29,7 @@
       </mat-select>
     </div>
     @if (searchQuery || filterCategory !== 'All') {
-      <button class="btn text-btn" (click)="clearFilters()">Clear Filters</button>
+      <button class="clear-filter-btn" (click)="clearFilters()" matTooltip="Clear Filters"><mat-icon>clear</mat-icon></button>
     }
   </div>
 

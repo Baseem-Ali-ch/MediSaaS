@@ -83,6 +83,20 @@ export const routes: Routes = [
             (m) => m.TestsManagementComponent,
           ),
       },
+      {
+        path: 'bookings',
+        loadComponent: () =>
+          import('./pages/admin-portal/bookings/bookings.component').then(
+            (m) => m.BookingsComponent,
+          ),
+      },
+      {
+        path: 'reports',
+        loadComponent: () =>
+          import('./pages/admin-portal/reports/reports.component').then(
+            (m) => m.ReportsComponent,
+          ),
+      },
       { path: '**', redirectTo: '/404' },
     ],
   },

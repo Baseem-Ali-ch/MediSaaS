@@ -1,0 +1,275 @@
+<div class="page-container">
+  <div class="page-header flex-between">
+    <div class="header-title">
+      <h1>Reports Management</h1>
+      <p class="text-muted">Manage patient test results and generate reports</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-row">
+    <div class="search-box">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        placeholder="Search by name, ID or booking no..."
+      />
+    </div>
+    @if (searchQuery) {
+      <button class="clear-filter-btn" (click)="searchQuery = ''" matTooltip="Clear Search">
+        <mat-icon>clear</mat-icon>
+      </button>
+    }
+  </div>
+
+  <mat-tab-group class="modern-tabs mt-24" [(selectedIndex)]="activeTab">
+    <!-- Pending Reports Tab -->
+    <mat-tab label="Pending Reports">
+      <div class="table-card no-border-top">
+        <div class="table-container scrollable-x">
+          <table mat-table [dataSource]="getFilteredPending()" class="modern-table">
+            <ng-container matColumnDef="bookingNo">
+              <th mat-header-cell *matHeaderCellDef>Booking No</th>
+              <td mat-cell *matCellDef="let booking">{{ booking.bookingNo }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="patientName">
+              <th mat-header-cell *matHeaderCellDef>Patient Name</th>
+              <td mat-cell *matCellDef="let booking">
+                <b>{{ booking.patientName }}</b>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="tests">
+              <th mat-header-cell *matHeaderCellDef>Tests</th>
+              <td mat-cell *matCellDef="let booking">
+                <div class="flex-wrap gap-4">
+                  @for (test of booking.tests; track test.id) {
+                    <span class="role-badge">{{ test.testName }}</span>
+                  }
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="bookedDate">
+              <th mat-header-cell *matHeaderCellDef>Booked Date</th>
+              <td mat-cell *matCellDef="let booking">
+                {{ booking.bookedFor | date: 'mediumDate' }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let booking">
+                <div class="flex justify-end gap-8">
+                  <button
+                    class="action-btn text-secondary"
+                    (click)="openGenerateReport(booking)"
+                    matTooltip="Generate Report"
+                  >
+                    <mat-icon>assignment</mat-icon>
+                  </button>
+                  <button class="action-btn" matTooltip="Edit Booking">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button class="action-btn text-danger" matTooltip="Delete">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="pendingColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: pendingColumns"></tr>
+
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell p-24 text-center" colspan="5">
+                <div class="empty-state">
+                  <mat-icon style="font-size: 48px; width: 48px; height: 48px"
+                    >assignment_turned_in</mat-icon
+                  >
+                  <h3>No pending reports</h3>
+                  <p>All bookings have been processed.</p>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <app-pagination
+          [totalItems]="totalPendingItems"
+          [pageSize]="pageSize"
+          [currentPage]="currentPage"
+          (pageChange)="onPageChange($event)"
+        ></app-pagination>
+      </div>
+    </mat-tab>
+
+    <!-- Generated Reports Tab -->
+    <mat-tab label="Generated Reports">
+      <div class="table-card no-border-top">
+        <div class="table-container scrollable-x">
+          <table mat-table [dataSource]="getFilteredReported()" class="modern-table">
+            <ng-container matColumnDef="reportId">
+              <th mat-header-cell *matHeaderCellDef>Report ID</th>
+              <td mat-cell *matCellDef="let report">
+                <a href="javascript:void(0)" class="id-link" (click)="openReportDetails(report)">{{
+                  report.reportId
+                }}</a>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="bookingNo">
+              <th mat-header-cell *matHeaderCellDef>Booking No</th>
+              <td mat-cell *matCellDef="let report">{{ report.bookingNo }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="patientName">
+              <th mat-header-cell *matHeaderCellDef>Patient Name</th>
+              <td mat-cell *matCellDef="let report">
+                <b>{{ report.patientName }}</b>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="tests">
+              <th mat-header-cell *matHeaderCellDef>Tests</th>
+              <td mat-cell *matCellDef="let report">
+                <div class="flex-wrap gap-4">
+                  @for (test of report.tests; track test.id) {
+                    <span class="role-badge">{{ test.testName }}</span>
+                  }
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="reportedDate">
+              <th mat-header-cell *matHeaderCellDef>Reported Date</th>
+              <td mat-cell *matCellDef="let report">
+                {{ report.reportedDate | date: 'mediumDate' }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let report">
+                <div class="flex justify-end gap-8">
+                  <button
+                    class="action-btn text-secondary"
+                    (click)="printReport(report)"
+                    matTooltip="Print Report"
+                  >
+                    <mat-icon>print</mat-icon>
+                  </button>
+                  <button
+                    class="action-btn"
+                    (click)="openEditReport(report)"
+                    matTooltip="Edit Report"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button
+                    class="action-btn text-danger"
+                    (click)="deleteReport(report)"
+                    matTooltip="Delete"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="reportedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: reportedColumns"></tr>
+
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell p-24 text-center" colspan="6">
+                <div class="empty-state">
+                  <mat-icon style="font-size: 48px; width: 48px; height: 48px"
+                    >description</mat-icon
+                  >
+                  <h3>No generated reports</h3>
+                  <p>Process a pending report to see it here.</p>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <app-pagination
+          [totalItems]="totalReportedItems"
+          [pageSize]="pageSize"
+          [currentPage]="currentPage"
+          (pageChange)="onPageChange($event)"
+        ></app-pagination>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+
+<!-- Report Generation Side Panel -->
+<div class="panel-overlay" [class.open]="isPanelOpen" (click)="closePanel()"></div>
+<div class="slide-panel max-w-800" [class.open]="isPanelOpen">
+  <div class="panel-header-simple">
+    <div class="panel-title">
+      <mat-icon>assignment</mat-icon>
+      <h2>Generate Test Report</h2>
+    </div>
+    <button class="close-btn" (click)="closePanel()"><mat-icon>close</mat-icon></button>
+  </div>
+
+  <div class="panel-body">
+    <div class="report-entry-container flex-col gap-24">
+      <!-- Results Entry Table -->
+      <div class="results-table-container">
+        <h3 class="mb-16">Test Results</h3>
+        <table class="modern-data-table">
+          <thead>
+            <tr>
+              <th>Test Parameter</th>
+              <th width="200">Result</th>
+              <th>Unit</th>
+              <th>Reference Range</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (res of reportModel.results; track res.testId) {
+              <tr>
+                <td>
+                  <b>{{ res.testName }}</b>
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    [(ngModel)]="res.value"
+                    class="form-control mini"
+                    placeholder="Enter result"
+                  />
+                </td>
+                <td>
+                  <span class="text-muted">{{ res.unit || '-' }}</span>
+                </td>
+                <td>
+                  <span class="text-muted">{{ res.referenceRange || '-' }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="panel-footer flex justify-between align-center">
+    <button class="btn btn-outline-secondary" (click)="previewReport()">
+      <mat-icon>visibility</mat-icon> Preview
+    </button>
+    <div class="flex gap-12">
+      <button class="btn btn-secondary" (click)="saveReport(true)" [disabled]="isSubmitting">
+        Draft
+      </button>
+      <button class="btn btn-primary" (click)="saveReport(false)" [disabled]="isSubmitting">
+        <mat-icon>check_circle</mat-icon> Save
+      </button>
+    </div>
+  </div>
+</div>

@@ -12,11 +12,12 @@ model Branch {
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 
-  labId Int
-  lab   Lab @relation(fields: [labId], references: [id])
-
   users        User[]
   activityLogs ActivityLog[]
   patients     Patient[]
   tests        Test[]
+  bookings     Booking[]
+
+  labId Int
+  lab   Lab @relation(fields: [labId], references: [id])
 }

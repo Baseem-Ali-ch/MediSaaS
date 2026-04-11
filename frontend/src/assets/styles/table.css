@@ -72,9 +72,12 @@
 }
 .action-btn.text-danger:hover {
   color: #ef4444;
-  background: transparent;
+  background: rgba(239, 68, 68, 0.1);
 }
-
+.action-btn.text-secondary:hover {
+  color: #1f2020;
+  background: rgba(31, 32, 32, 0.1);
+}
 .text-right {
   text-align: right;
 }

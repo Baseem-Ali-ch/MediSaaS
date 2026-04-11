@@ -1,0 +1,25 @@
+model Booking {
+    id            Int      @id @default(autoincrement())
+    bookingNo     String   @unique
+    testsCount    Int
+    totalAmount   Decimal  @db.Decimal(10, 2)
+    discountType  String? // PERCENTAGE | AMOUNT
+    discountValue Decimal  @db.Decimal(10, 2)
+    finalAmount   Decimal  @db.Decimal(10, 2)
+    paymentStatus String?  @default("PENDING") // PENDING | PARTIALLY | PAID
+    bookingStatus String?  @default("PENDING") // PENDING | PROCESSING | REPORTED | CANCELLED
+    bookedFor     DateTime
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    tests Test[]
+
+    patientId Int
+    patient   Patient @relation(fields: [patientId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+    branchId Int
+    branch   Branch @relation(fields: [branchId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+    labId Int
+    lab   Lab @relation(fields: [labId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}

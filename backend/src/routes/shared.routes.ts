@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authenticate } from "../middlewares/authenticate";
 import * as patientController from "../controllers/shared/patient.controller";
 import * as testController from "../controllers/shared/test.controller";
+import * as bookingController from "../controllers/shared/booking.controller";
 
 const router = Router();
 
@@ -18,5 +19,10 @@ router.get("/tests/:id", testController.getTestById);
 router.post("/tests", testController.createTest);
 router.put("/tests/:id", testController.updateTest);
 router.delete("/tests/:id", testController.deleteTest);
+
+router.get("/bookings", bookingController.getBookings);
+router.post("/bookings", bookingController.createBooking);
+router.put("/bookings/:id", bookingController.updateBooking);
+router.delete("/bookings/:id", bookingController.cancelBooking);
 
 export default router;

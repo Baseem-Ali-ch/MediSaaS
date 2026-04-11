@@ -1,32 +1,30 @@
 model Test {
-  id         Int     @id @default(autoincrement())
-  testCode   String?
-  testName   String
-  shortName  String
-  category   String?
-  sampleType String?
-  price      Int?
-  status     String? @default("Active")
+  id               Int      @id @default(autoincrement())
+  testCode         String?
+  testName         String
+  shortName        String
+  category         String?
+  sampleType       String?
+  price            Int?
+  status           String?  @default("Active")
+  resultType       String?
+  unit             String?
+  referenceRange   String?
+  method           String?
+  turnaroundTime   String?
+  fastingRequired  Boolean  @default(false)
+  preparationNotes String?  @db.NVarChar(Max)
+  description      String?  @db.NVarChar(Max)
+  parameters       String?  @db.NVarChar(Max)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  resultType     String?
-  unit           String?
-  referenceRange String?
-  method         String?
-  turnaroundTime String?
-
-  fastingRequired  Boolean @default(false)
-  preparationNotes String? @db.NVarChar(Max)
-  description      String? @db.NVarChar(Max)
-  parameters       String? @db.NVarChar(Max)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  activityLogs ActivityLog[]
+  bookings     Booking[]
 
   labId Int
   lab   Lab @relation(fields: [labId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   branchId Int?
   branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull, onUpdate: NoAction)
-
-  activityLogs ActivityLog[]
 }

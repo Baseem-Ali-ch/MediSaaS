@@ -20,11 +20,11 @@ model User {
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
 
+  activityLogs ActivityLog[]
+
   labId Int
   lab   Lab @relation(fields: [labId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   branchId Int?
   branch   Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull, onUpdate: NoAction)
-
-  activityLogs ActivityLog[]
 }

@@ -134,14 +134,7 @@ export class TestsManagementComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           if (res.data) {
-            // Parse parameters string to JSON array
-            this.testList = res.data.map((t: any) => ({
-              ...t,
-              parameters:
-                t.parameters && typeof t.parameters === 'string'
-                  ? JSON.parse(t.parameters)
-                  : t.parameters || [],
-            }));
+            this.testList = res.data;
           }
         },
         error: (err) => {
@@ -283,15 +276,9 @@ export class TestsManagementComponent implements OnInit {
     if (!this.formValid()) return;
     this.isSubmitting = true;
 
-    // Convert parameters array to JSON string for backend
-    const testPayload = {
-      ...this.testModel,
-      parameters: JSON.stringify(this.testModel.parameters),
-    };
-
     const req = this.editMode
-      ? this.httpService.put(`/shared/tests/${this.testModel.id}`, testPayload)
-      : this.httpService.post('/shared/tests', testPayload);
+      ? this.httpService.put(`/shared/tests/${this.testModel.id}`, this.testModel)
+      : this.httpService.post('/shared/tests', this.testModel);
 
     req
       .pipe(

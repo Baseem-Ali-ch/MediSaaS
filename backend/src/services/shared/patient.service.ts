@@ -56,7 +56,7 @@ export const createPatient = async (
   }
 
   const count = await prisma.patient.count({ where: { labId: user.labId } });
-  const refId = `PAT-${String(count + 1).padStart(5, "0")}`;
+  const refId = `PAT-${String(count + 1).padStart(3, "0")}`;
 
   const { branchId, ...patientData } = mappedData;
 

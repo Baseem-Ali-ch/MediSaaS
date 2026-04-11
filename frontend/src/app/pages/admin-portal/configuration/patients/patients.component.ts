@@ -328,7 +328,7 @@ export class PatientsComponent implements OnInit {
             if (res.success) {
               const idx = this.patients.findIndex((p) => p.id === this.patientModel.id);
               if (idx !== -1) {
-                this.patients[idx] = { ...this.patientModel };
+                this.patients[idx] = { ...res.data };
                 this.patients = [...this.patients];
                 this.toastService.show('Patient updated successfully');
               }
@@ -354,9 +354,7 @@ export class PatientsComponent implements OnInit {
           next: (res: any) => {
             if (res.success) {
               const newPatient = {
-                ...this.patientModel,
-                id: res.data?.id || res.id,
-                patientId: res.data?.patientId || res.patientId,
+                ...res.data,
               };
               this.patients = [...this.patients, newPatient];
               this.updateTotalCount();

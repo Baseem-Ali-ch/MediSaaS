@@ -283,3 +283,29 @@ html.dark .floating-input-wrapper.focused {
 .spinner {
   animation: spinner 1s linear infinite;
 }
+
+.icon-only-btn {
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-button);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.icon-only-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.icon-only-btn mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+}

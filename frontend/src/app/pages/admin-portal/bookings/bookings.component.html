@@ -1,0 +1,381 @@
+<div class="page-container">
+  <div class="page-header flex-between">
+    <div class="header-title">
+      <h1>Booking Management</h1>
+      <p class="text-muted">Create and manage patient test bookings</p>
+    </div>
+    <button class="btn btn-primary" (click)="openAddPanel()">
+      <mat-icon>add_shopping_cart</mat-icon> Create Booking
+    </button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-row">
+    <div class="search-box">
+      <mat-icon>search</mat-icon>
+      <input type="text" [(ngModel)]="searchQuery" placeholder="Search by name, ID or phone..." />
+    </div>
+
+    <div class="filter-select">
+      <mat-select
+        [(ngModel)]="filterPaymentStatus"
+        class="modern-select"
+        panelClass="custom-select-panel"
+      >
+        <mat-option value="All">All</mat-option>
+        <mat-option value="Pending">Pending</mat-option>
+        <mat-option value="Partial">Partial</mat-option>
+        <mat-option value="Completed">Completed</mat-option>
+      </mat-select>
+    </div>
+
+    <div class="filter-select">
+      <mat-select
+        [(ngModel)]="filterBookingStatus"
+        class="modern-select"
+        panelClass="custom-select-panel"
+      >
+        <mat-option value="All">All</mat-option>
+        <mat-option value="Booked">Booked</mat-option>
+        <mat-option value="In Progress">In Progress</mat-option>
+        <mat-option value="Completed">Completed</mat-option>
+        <mat-option value="Cancelled">Cancelled</mat-option>
+      </mat-select>
+    </div>
+
+    @if (searchQuery || filterPaymentStatus !== 'All' || filterBookingStatus !== 'All') {
+      <button class="clear-filter-btn" (click)="clearFilters()" matTooltip="Clear Filters">
+        <mat-icon>clear</mat-icon>
+      </button>
+    }
+  </div>
+
+  <p class="results-count text-muted">
+    Showing {{ getFilteredBookings().length }} of {{ totalFilteredItems }} bookings
+  </p>
+
+  <!-- Table Section -->
+  <div class="table-card mt-24">
+    <div class="table-container scrollable-x">
+      <table mat-table [dataSource]="getFilteredBookings()" matSort class="modern-table">
+        <!-- Booking No -->
+        <ng-container matColumnDef="bookingNo">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Booking No</th>
+          <td mat-cell *matCellDef="let booking">
+            <a href="javascript:void(0)" class="id-link" (click)="openBookingDetails(booking)">{{
+              booking.bookingNo
+            }}</a>
+          </td>
+        </ng-container>
+
+        <!-- Patient Name -->
+        <ng-container matColumnDef="patientName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Patient Name</th>
+          <td mat-cell *matCellDef="let booking">
+            <b>{{ booking.patientName }}</b>
+          </td>
+        </ng-container>
+
+        <!-- Tests Count -->
+        <ng-container matColumnDef="testsCount">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Tests Count</th>
+          <td mat-cell *matCellDef="let booking">{{ booking.testsCount }}</td>
+        </ng-container>
+
+        <!-- Total -->
+        <ng-container matColumnDef="totalAmount">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Total</th>
+          <td mat-cell *matCellDef="let booking">₹{{ booking.totalAmount }}</td>
+        </ng-container>
+
+        <!-- Discount -->
+        <ng-container matColumnDef="discount">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Discount</th>
+          <td mat-cell *matCellDef="let booking">
+            {{ booking.discountValue }} {{ booking.discountType === 'Percentage' ? '%' : '₹' }}
+          </td>
+        </ng-container>
+
+        <!-- Net Total -->
+        <ng-container matColumnDef="netTotal">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Net Total</th>
+          <td mat-cell *matCellDef="let booking">
+            {{ booking.finalAmount }}
+          </td>
+        </ng-container>
+
+        <!-- Payment Status -->
+        <ng-container matColumnDef="paymentStatus">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Payment Status</th>
+          <td mat-cell *matCellDef="let booking">
+            <span
+              class="status-badge"
+              [class.completed]="booking.paymentStatus === 'Completed'"
+              [class.partial]="booking.paymentStatus === 'Partial'"
+              [class.pending]="booking.paymentStatus === 'Pending'"
+            >
+              {{ booking.paymentStatus }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Booking Status -->
+        <ng-container matColumnDef="bookingStatus">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Booking Status</th>
+          <td mat-cell *matCellDef="let booking">
+            <span class="role-badge">{{ booking.bookingStatus }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Booked For -->
+        <ng-container matColumnDef="bookedFor">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Booked For</th>
+          <td mat-cell *matCellDef="let booking">{{ booking.bookedFor | date }}</td>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let booking">
+            <div class="flex" style="justify-content: flex-end; gap: 8px">
+              <button class="action-btn" (click)="openEditPanel(booking)" matTooltip="Edit">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                class="action-btn text-danger"
+                matTooltip="Cancel Booking"
+                (click)="cancelBooking(booking)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell p-24 text-center" colspan="9">
+            <div class="empty-state">
+              <mat-icon style="font-size: 48px; width: 48px; height: 48px">event_busy</mat-icon>
+              <h3>No bookings found</h3>
+              <p>Create a new booking to get started.</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Reuse Pagination -->
+    <app-pagination
+      [totalItems]="totalFilteredItems"
+      [pageSize]="pageSize"
+      [currentPage]="currentPage"
+      (pageChange)="onPageChange($event)"
+    ></app-pagination>
+  </div>
+</div>
+
+<!-- Slide Over Panel Overlay -->
+<div class="panel-overlay" [class.open]="isPanelOpen" (click)="closePanel()"></div>
+
+<!-- Slide Over Panel (Booking Form) -->
+<div class="slide-panel" [class.open]="isPanelOpen">
+  <div class="panel-header-simple">
+    <div class="panel-title">
+      <mat-icon>add_shopping_cart</mat-icon>
+      <h2>Create New Booking</h2>
+    </div>
+    <button class="close-btn" (click)="closePanel()"><mat-icon>close</mat-icon></button>
+  </div>
+
+  <div class="panel-body">
+    <form class="clean-form flex-col gap-24">
+      <!-- Patient Select Row -->
+      <div class="flex align-center gap-16" style="justify-content: space-between">
+        <div class="form-group flex-1" style="width: 85%">
+          <div class="floating-input-wrapper">
+            <mat-icon class="input-icon">person</mat-icon>
+            <mat-select
+              [(ngModel)]="bookingModel.patientId"
+              name="patient"
+              class="modern-select"
+              panelClass="custom-select-panel"
+            >
+              @for (p of patients; track p.id) {
+                <mat-option [value]="p.id">
+                  <div class="option-content">
+                    <span>{{ p.name }}</span>
+                  </div>
+                </mat-option>
+              }
+            </mat-select>
+            <label for="patient" [class.floated]="true">Select Patient *</label>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn btn-outline-primary icon-only-btn"
+          matTooltip="Create Patient"
+          style="padding: 0"
+        >
+          <mat-icon>person_add</mat-icon>
+        </button>
+      </div>
+
+      <!-- Test Select Row -->
+      <div class="flex align-center gap-16" style="justify-content: space-between">
+        <div class="form-group flex-1" style="width: 85%">
+          <div class="floating-input-wrapper">
+            <mat-icon class="input-icon">science</mat-icon>
+            <mat-select
+              [(ngModel)]="bookingModel.selectedTests"
+              name="tests"
+              multiple
+              class="modern-select"
+              panelClass="custom-select-panel"
+              (selectionChange)="onTestSelected()"
+            >
+              @for (t of tests; track t.id) {
+                <mat-option [value]="t">
+                  <div class="flex-between w-full">
+                    <span>{{ t.testName }}</span>
+                  </div>
+                </mat-option>
+              }
+            </mat-select>
+            <label for="tests" [class.floated]="true">Select Tests *</label>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn btn-outline-primary icon-only-btn"
+          matTooltip="Create Test"
+          style="padding: 0"
+        >
+          <mat-icon>add</mat-icon>
+        </button>
+      </div>
+      <!-- Selected Tests Chips -->
+      <div
+        class="selected-items-tags flex-wrap gap-8"
+        *ngIf="bookingModel.selectedTests.length > 0"
+      >
+        @for (st of bookingModel.selectedTests; track st.id) {
+          <span class="role-badge"> {{ st.testName }} (₹{{ st.price }}) </span>
+        }
+      </div>
+
+      <div class="calculation-section p-24 bg-light rounded-8 mt-8">
+        <div class="flex-between mb-12">
+          <span class="text-muted">Subtotal</span>
+          <span class="font-600">₹{{ bookingModel.subtotal }}</span>
+        </div>
+
+        <div class="grid-2 gap-16 mb-12">
+          <div class="form-group mb-0">
+            <label class="form-label small">Discount Type</label>
+            <div class="floating-input-wrapper focused mini-wrapper">
+              <mat-select
+                [(ngModel)]="bookingModel.discountType"
+                name="dtype"
+                class="modern-select mini"
+                panelClass="custom-select-panel"
+                (selectionChange)="calculateTotal()"
+              >
+                <mat-option value="Percentage">Percentage (%)</mat-option>
+                <mat-option value="Amount">Amount (₹)</mat-option>
+              </mat-select>
+            </div>
+          </div>
+          <div class="form-group mb-0">
+            <label class="form-label small">Value</label>
+            <div class="floating-input-wrapper focused mini-wrapper">
+              <input
+                type="number"
+                [(ngModel)]="bookingModel.discountValue"
+                name="dval"
+                class="form-control mini"
+                (input)="calculateTotal()"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-between pt-16 mt-16">
+          <span class="h3 mb-0">Final Amount</span>
+          <span class="h3 mb-0 text-primary">₹{{ bookingModel.totalAmount }}</span>
+        </div>
+      </div>
+
+      <div class="grid-2 gap-24">
+        <!-- Payment Status Dropdown -->
+        <div class="form-group mat-select-group">
+          <div class="floating-input-wrapper">
+            <mat-icon class="input-icon">payments</mat-icon>
+            <mat-select
+              [(ngModel)]="bookingModel.paymentStatus"
+              name="paymentStatus"
+              class="modern-select"
+              panelClass="custom-select-panel"
+            >
+              <mat-option value="Pending">Pending</mat-option>
+              <mat-option value="Partial">Partial</mat-option>
+              <mat-option value="Completed">Completed</mat-option>
+            </mat-select>
+            <label class="floated">Payment Status *</label>
+          </div>
+        </div>
+
+        <!-- Booked For Date using mat-datepicker -->
+        <div class="form-group">
+          <div
+            class="floating-input-wrapper pointer"
+            [class.focused]="isPickerOpen"
+            (click)="picker.open()"
+          >
+            <mat-icon class="input-icon">calendar_today</mat-icon>
+            <input
+              matInput
+              [matDatepicker]="picker"
+              [(ngModel)]="bookingModel.bookedFor"
+              name="bookedFor"
+              placeholder=" "
+              readonly
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="picker"
+              class="datepicker-toggle"
+            ></mat-datepicker-toggle>
+            <mat-datepicker
+              #picker
+              (opened)="isPickerOpen = true"
+              (closed)="isPickerOpen = false"
+            ></mat-datepicker>
+            <label class="floated">Booking Date *</label>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="panel-footer">
+    <button type="button" class="btn btn-secondary" (click)="closePanel()">Cancel</button>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="
+        isSubmitting || !bookingModel.patientId || bookingModel.selectedTests.length === 0
+      "
+      (click)="saveBooking()"
+    >
+      @if (isSubmitting) {
+        <mat-icon class="spinner">autorenew</mat-icon> Processing...
+      } @else {
+        <mat-icon>check_circle</mat-icon> Confirm Booking
+      }
+    </button>
+  </div>
+</div>
