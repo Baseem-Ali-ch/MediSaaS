@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,16 +19,20 @@ import { ToastService } from '../../../services/toast.service';
 import { finalize } from 'rxjs';
 import { ConfirmationPopupComponent } from '../../../components/popup/confirmation/confirmation.component';
 import { ReportDetailsPopupComponent } from './report-details.popup';
+import { ReportPreviewPopupComponent } from './report-preview.popup';
+import { BookingDetailsPopupComponent } from '../bookings/booking-details.popup';
 
 export interface ReportData {
   id: string;
   reportId: string;
+  bookingId: string;
+  patientId: string;
   bookingNo: string;
   patientName: string;
   patientDetails: any;
   tests: any[];
   reportedDate: string;
-  status: 'Draft' | 'Reported';
+  status: 'DRAFT' | 'REPORTED';
   results: any[];
 }
 
@@ -59,9 +64,16 @@ export interface ReportData {
 export class ReportsComponent implements OnInit {
   pendingBookings: any[] = [];
   generatedReports: ReportData[] = [];
-  
+
   pendingColumns: string[] = ['bookingNo', 'patientName', 'tests', 'bookedDate', 'actions'];
-  reportedColumns: string[] = ['reportId', 'bookingNo', 'patientName', 'tests', 'reportedDate', 'actions'];
+  reportedColumns: string[] = [
+    'reportId',
+    'bookingNo',
+    'patientName',
+    'tests',
+    'reportedDate',
+    'actions',
+  ];
 
   @ViewChild('pendingSort') pendingSort!: MatSort;
   @ViewChild('reportedSort') reportedSort!: MatSort;
@@ -73,12 +85,16 @@ export class ReportsComponent implements OnInit {
   totalReportedItems: number = 0;
 
   isPanelOpen = false;
-  isSubmitting = false;
+  isSubmitting1 = false;
+  isSubmitting2 = false;
+  isSubmitting3 = false;
   activeTab: number = 0;
 
   // Report Form Model
   reportModel: any = {
+    id: '',
     bookingId: '',
+    patientId: '',
     bookingNo: '',
     patientName: '',
     patientDetails: null,
@@ -87,8 +103,8 @@ export class ReportsComponent implements OnInit {
     labDetails: {
       name: 'Central Diagnostic Lab',
       address: '123 Health St, Medical District',
-      contact: '+91 9876543210'
-    }
+      contact: '+91 9876543210',
+    },
   };
 
   constructor(
@@ -97,125 +113,66 @@ export class ReportsComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private toastService: ToastService,
     private dialog: MatDialog,
+    private router: Router,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
-    this.fetchData();
+    this.fetchReports();
+    this.fetchPendingBookings();
   }
 
-  fetchData() {
+  fetchPendingBookings() {
     this.loaderService.show();
-    
-    // Demo Data for initial display
-    const demoBookings = [
-      {
-        id: '1',
-        bookingNo: 'BK-1001',
-        patientName: 'John Doe',
-        patientDetails: { name: 'John Doe', age: 45, gender: 'Male', patientId: 'P-101' },
-        tests: [{ id: 't1', testName: 'Complete Blood Count', unit: 'g/dL', referenceRange: '13-17' }],
-        bookedFor: new Date().toISOString(),
-        bookingStatus: 'Pending'
-      },
-      {
-        id: '2',
-        bookingNo: 'BK-1002',
-        patientName: 'Jane Smith',
-        patientDetails: { name: 'Jane Smith', age: 32, gender: 'Female', patientId: 'P-102' },
-        tests: [
-          { id: 't2', testName: 'Blood Glucose', unit: 'mg/dL', referenceRange: '70-99' },
-          { id: 't3', testName: 'Lipid Profile', unit: 'mg/dL', referenceRange: '< 200' }
-        ],
-        bookedFor: new Date().toISOString(),
-        bookingStatus: 'In Progress'
-      }
-    ];
-
-    const demoReports: ReportData[] = [
-      {
-        id: '3',
-        reportId: 'REP-5501',
-        bookingNo: 'BK-0998',
-        patientName: 'Robert Wilson',
-        patientDetails: { name: 'Robert Wilson', age: 58, gender: 'Male', patientId: 'P-098' },
-        tests: [{ id: 't1', testName: 'Complete Blood Count' }],
-        reportedDate: new Date(Date.now() - 86400000).toISOString(),
-        status: 'Reported',
-        results: [
-          { testId: 't1', testName: 'Hemoglobin', value: '14.5', unit: 'g/dL', referenceRange: '13-17' },
-          { testId: 't1', testName: 'WBC Count', value: '7500', unit: 'cells/mcL', referenceRange: '4500-11000' }
-        ]
-      },
-      {
-        id: '4',
-        reportId: 'REP-5502',
-        bookingNo: 'BK-0999',
-        patientName: 'Emily Brown',
-        patientDetails: { name: 'Emily Brown', age: 24, gender: 'Female', patientId: 'P-099' },
-        tests: [{ id: 't4', testName: 'Thyroid Profile' }],
-        reportedDate: new Date(Date.now() - 172800000).toISOString(),
-        status: 'Reported',
-        results: [
-          { testId: 't4', testName: 'TSH', value: '2.4', unit: 'mIU/L', referenceRange: '0.4-4.0' }
-        ]
-      }
-    ];
-
-    this.httpService.get('/shared/bookings').pipe(
-      finalize(() => {
-        this.loaderService.hide();
-        // If API returns empty, use demo data
-        if (this.pendingBookings.length === 0) {
-          this.pendingBookings = demoBookings;
-          this.totalPendingItems = demoBookings.length;
-        }
-        if (this.generatedReports.length === 0) {
-          this.generatedReports = demoReports;
-          this.totalReportedItems = demoReports.length;
-        }
-        this.cdr.detectChanges();
-      })
-    ).subscribe({
-      next: (res: any) => {
-        const allBookings = res.data || [];
-        if (allBookings.length > 0) {
-          // Pending: Not reported yet
-          this.pendingBookings = allBookings.filter((b: any) => b.bookingStatus !== 'Reported');
+    this.httpService
+      .get('/shared/bookings')
+      .pipe(
+        finalize(() => {
+          this.loaderService.hide();
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (res: any) => {
+          const allBookings = res.data || [];
+          // Pending: Not reported yet (no reportId associated or status is not Reported)
+          this.pendingBookings = allBookings.filter((b: any) => b.bookingStatus !== 'REPORTED');
           this.totalPendingItems = this.pendingBookings.length;
+        },
+        error: () => {
+          this.toastService.show('Failed to fetch pending bookings');
+        },
+      });
+  }
 
-          // Reported mappings...
-          this.generatedReports = allBookings
-            .filter((b: any) => b.bookingStatus === 'Reported')
-            .map((b: any) => ({
-              id: b.id,
-              reportId: 'REP-' + b.bookingNo.split('-')[1],
-              bookingNo: b.bookingNo,
-              patientName: b.patientName,
-              patientDetails: b.patientDetails || { name: b.patientName, age: 30, gender: 'Male' },
-              tests: b.tests || [],
-              reportedDate: b.updatedAt || new Date().toISOString(),
-              status: 'Reported',
-              results: b.results || []
-            }));
+  fetchReports() {
+    this.loaderService.show();
+    this.httpService
+      .get('/shared/reports')
+      .pipe(
+        finalize(() => {
+          this.loaderService.hide();
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: (res: any) => {
+          this.generatedReports = res.data || [];
           this.totalReportedItems = this.generatedReports.length;
-        }
-      },
-      error: () => {
-        // Use demo data on error as well
-        this.pendingBookings = demoBookings;
-        this.totalPendingItems = demoBookings.length;
-        this.generatedReports = demoReports;
-        this.totalReportedItems = demoReports.length;
-        this.toastService.show('Showing demo data (API unreachable)');
-      }
-    });
+        },
+        error: () => {
+          this.toastService.show('Failed to fetch reports');
+        },
+      });
   }
 
   getFilteredPending() {
     let result = [...this.pendingBookings];
     if (this.searchQuery) {
       const q = this.searchQuery.toLowerCase();
-      result = result.filter(b => b.bookingNo.toLowerCase().includes(q) || b.patientName.toLowerCase().includes(q));
+      result = result.filter(
+        (b) => b.bookingNo.toLowerCase().includes(q) || b.patientName.toLowerCase().includes(q),
+      );
     }
     const start = (this.currentPage - 1) * this.pageSize;
     return result.slice(start, start + this.pageSize);
@@ -225,7 +182,12 @@ export class ReportsComponent implements OnInit {
     let result = [...this.generatedReports];
     if (this.searchQuery) {
       const q = this.searchQuery.toLowerCase();
-      result = result.filter(r => r.bookingNo.toLowerCase().includes(q) || r.patientName.toLowerCase().includes(q) || r.reportId.toLowerCase().includes(q));
+      result = result.filter(
+        (r) =>
+          r.bookingNo.toLowerCase().includes(q) ||
+          r.patientName.toLowerCase().includes(q) ||
+          r.reportId.toLowerCase().includes(q),
+      );
     }
     const start = (this.currentPage - 1) * this.pageSize;
     return result.slice(start, start + this.pageSize);
@@ -237,38 +199,22 @@ export class ReportsComponent implements OnInit {
 
   openGenerateReport(booking: any) {
     this.reportModel = {
-      bookingId: booking.id,
-      bookingNo: booking.bookingNo,
-      patientName: booking.patientName,
-      patientDetails: booking.patientDetails || { name: booking.patientName, age: '-', gender: '-' },
       tests: booking.tests || [],
-      results: (booking.tests || []).map((t: any) => ({
+      testResults: (booking.tests || []).map((t: any) => ({
         testId: t.id || t.testId,
         testName: t.testName,
-        value: '',
-        unit: t.unit || '',
+        result: '',
+        unit: t.unit || t.parameters?.split(',')[0].split(':')[1] || '',
         referenceRange: t.referenceRange || '',
-        status: 'Pending'
+        status: 'Pending',
       })),
-      labDetails: {
-        name: 'MediSaaS Central Lab',
-        address: 'Main Branch, City Center',
-        contact: '+91 1234567890'
-      }
     };
     this.isPanelOpen = true;
   }
 
   openEditReport(report: ReportData) {
-    // Similar to generate but with existing results
     this.reportModel = {
       ...report,
-      bookingId: report.id,
-      labDetails: {
-        name: 'MediSaaS Central Lab',
-        address: 'Main Branch, City Center',
-        contact: '+91 1234567890'
-      }
     };
     this.isPanelOpen = true;
   }
@@ -278,28 +224,46 @@ export class ReportsComponent implements OnInit {
   }
 
   saveReport(isDraft: boolean) {
-    this.isSubmitting = true;
-    const status = isDraft ? 'In Progress' : 'Reported';
-    
-    // In real app, call API to save report and update booking status
+    if (isDraft) {
+      this.isSubmitting2 = true;
+    } else {
+      this.isSubmitting3 = true;
+    }
+    const status = isDraft ? 'DRAFT' : 'REPORTED';
     const payload = {
       bookingId: this.reportModel.bookingId,
-      results: this.reportModel.results,
-      status: status
+      patientId: this.reportModel.patientId,
+      status: status,
+      testResults: this.reportModel.testResults.map((r: any) => ({
+        testId: r.testId,
+        result: r.result || '-',
+      })),
     };
 
-    this.httpService.put(`/shared/bookings/${this.reportModel.bookingId}`, { bookingStatus: status, results: this.reportModel.results })
-      .pipe(finalize(() => {
-        this.isSubmitting = false;
-        this.cdr.detectChanges();
-      }))
+    const request = this.reportModel.id
+      ? this.httpService.put(`/shared/reports/${this.reportModel.id}`, payload)
+      : this.httpService.post('/shared/reports', payload);
+
+    request
+      .pipe(
+        finalize(() => {
+          this.isSubmitting3 = false;
+          this.isSubmitting2 = false;
+          this.cdr.detectChanges();
+        }),
+      )
       .subscribe({
         next: (res: any) => {
-          this.toastService.show(`Report saved as ${status} successfully`);
+          this.toastService.show(
+            `Report ${this.reportModel.id ? 'updated' : 'created'} successfully`,
+          );
           this.closePanel();
-          this.fetchData();
+          this.fetchReports();
+          this.fetchPendingBookings();
         },
-        error: () => this.toastService.show('Failed to save report')
+        error: (err: any) => {
+          this.toastService.show(err.error?.message || 'Failed to save report');
+        },
       });
   }
 
@@ -307,37 +271,61 @@ export class ReportsComponent implements OnInit {
     this.dialog.open(ReportDetailsPopupComponent, {
       width: '800px',
       panelClass: 'sharp-dialog',
-      data: { report }
+      data: { report },
     });
   }
 
-  deleteReport(report: any) {
+  deleteReport(report: ReportData) {
     const dialogRef = this.dialog.open(ConfirmationPopupComponent, {
       width: '400px',
       panelClass: 'sharp-dialog',
       data: {
         title: 'Delete Report',
-        message: `Are you sure you want to delete report for <b>${report.patientName}</b>?`,
+        message: `Are you sure you want to delete report <b>${report.reportId}</b> for <b>${report.patientName}</b>?`,
         type: 'error',
-        confirmText: 'Delete'
-      }
+        confirmText: 'Delete',
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.toastService.show('Report deleted successfully');
-        // Logic to delete...
+        this.loaderService.show();
+        this.httpService
+          .delete(`/shared/reports/${report.id}`)
+          .pipe(finalize(() => this.loaderService.hide()))
+          .subscribe({
+            next: () => {
+              this.toastService.show('Report deleted successfully');
+              this.fetchReports();
+              this.fetchPendingBookings();
+            },
+            error: () => this.toastService.show('Failed to delete report'),
+          });
       }
     });
   }
 
   printReport(report: ReportData) {
-    this.toastService.show('Preparing print view...');
-    // Implementation for printing
+    this.previewReport(report, true);
   }
 
-  previewReport() {
-    this.toastService.show('Opening preview...');
-    // Implementation for preview
+  previewReport(report: ReportData, printImmediately = false) {
+    this.dialog.open(ReportPreviewPopupComponent, {
+      width: '100%',
+      maxWidth: '1000px',
+      data: {
+        report,
+        printOnOpen: printImmediately,
+      },
+      panelClass: 'sharp-dialog',
+    });
+  }
+
+  openBookingDetails(booking: any) {
+    this.dialog.open(BookingDetailsPopupComponent, {
+      width: '600px',
+      panelClass: 'sharp-dialog',
+      data: { booking },
+    });
   }
 }

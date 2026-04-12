@@ -19,6 +19,7 @@ model Patient {
 
   activityLogs ActivityLog[]
   bookings     Booking[]
+  reports      Report[]
 
   labId Int
   lab   Lab @relation(fields: [labId], references: [id], onDelete: NoAction, onUpdate: NoAction)

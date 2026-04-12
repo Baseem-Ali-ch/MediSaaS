@@ -11,6 +11,18 @@ export class TestRepository extends BaseRepository<
   }
 
   getTests = async (labId: number) => {
-    return this.prisma.test.findMany({ where: { labId, status: { not: "SUSPENDED" } } });
+    return this.prisma.test.findMany({
+      where: { labId, status: { not: "SUSPENDED" } },
+    });
+  };
+
+  getTestsByIds = async (ids: number[]) => {
+    return this.prisma.test.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
   };
 }

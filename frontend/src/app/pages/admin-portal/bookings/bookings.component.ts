@@ -82,6 +82,7 @@ export class BookingsComponent implements OnInit {
   currentPage: number = 1;
   pageSize: number = 10;
   totalFilteredItems: number = 0;
+  filteredBookings: BookingData[] = [];
 
   isPanelOpen = false;
   editMode = false;
@@ -136,13 +137,12 @@ export class BookingsComponent implements OnInit {
       .pipe(
         finalize(() => {
           this.loaderService.hide();
-          this.cdr.detectChanges();
         }),
       )
       .subscribe({
         next: (res: any) => {
           this.bookings = res.data || [];
-          this.updateTotalCount();
+          this.applyFilters();
         },
         error: () => {
           this.toastService.show('Failed to fetch bookings list');
@@ -172,7 +172,10 @@ export class BookingsComponent implements OnInit {
     });
   }
 
-  getFilteredBookings(): BookingData[] {
+  applyFilters(resetPage: boolean = false) {
+    if (resetPage) {
+      this.currentPage = 1;
+    }
     let result = [...this.bookings];
 
     if (this.filterPaymentStatus !== 'All') {
@@ -189,9 +192,15 @@ export class BookingsComponent implements OnInit {
         (b) => b.bookingNo.toLowerCase().includes(q) || b.patientName.toLowerCase().includes(q),
       );
     }
+
     this.totalFilteredItems = result.length;
+
     const start = (this.currentPage - 1) * this.pageSize;
-    return result.slice(start, start + this.pageSize);
+    this.filteredBookings = result.slice(start, start + this.pageSize);
+  }
+
+  getFilteredBookings(): BookingData[] {
+    return this.filteredBookings;
   }
 
   clearFilters() {
@@ -199,15 +208,12 @@ export class BookingsComponent implements OnInit {
     this.filterPaymentStatus = 'All';
     this.filterBookingStatus = 'All';
     this.currentPage = 1;
-  }
-
-  updateTotalCount() {
-    this.totalFilteredItems = this.bookings.length;
+    this.applyFilters();
   }
 
   onPageChange(page: number) {
     this.currentPage = page;
-    this.cdr.detectChanges();
+    this.applyFilters(false);
   }
 
   openAddPanel() {
@@ -310,7 +316,6 @@ export class BookingsComponent implements OnInit {
         .pipe(
           finalize(() => {
             this.isSubmitting = false;
-            this.cdr.detectChanges();
           }),
         )
         .subscribe({
@@ -339,6 +344,7 @@ export class BookingsComponent implements OnInit {
                 };
                 this.bookings[idx] = updatedBooking;
                 this.bookings = [...this.bookings];
+                this.applyFilters();
                 this.toastService.show('Booking updated successfully');
               }
               this.closePanel();
@@ -356,7 +362,6 @@ export class BookingsComponent implements OnInit {
         .pipe(
           finalize(() => {
             this.isSubmitting = false;
-            this.cdr.detectChanges();
           }),
         )
         .subscribe({
@@ -380,7 +385,7 @@ export class BookingsComponent implements OnInit {
                 tests: [...this.bookingModel.selectedTests],
               };
               this.bookings = [...this.bookings, newBooking];
-              this.updateTotalCount();
+              this.applyFilters();
               this.toastService.show('Booking created successfully');
               this.closePanel();
             } else {
@@ -414,14 +419,13 @@ export class BookingsComponent implements OnInit {
           .pipe(
             finalize(() => {
               this.loaderService.hide();
-              this.cdr.detectChanges();
             }),
           )
           .subscribe({
             next: (res: any) => {
               if (res.success) {
                 this.bookings = this.bookings.filter((b) => b.id !== booking.id);
-                this.updateTotalCount();
+                this.applyFilters();
                 this.toastService.show('Booking cancelled successfully');
               } else {
                 this.toastService.show(res.message || 'Failed to cancel booking');

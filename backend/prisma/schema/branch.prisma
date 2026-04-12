@@ -17,6 +17,7 @@ model Branch {
   patients     Patient[]
   tests        Test[]
   bookings     Booking[]
+  reports      Report[]
 
   labId Int
   lab   Lab @relation(fields: [labId], references: [id])

@@ -31,13 +31,20 @@
           <table mat-table [dataSource]="getFilteredPending()" class="modern-table">
             <ng-container matColumnDef="bookingNo">
               <th mat-header-cell *matHeaderCellDef>Booking No</th>
-              <td mat-cell *matCellDef="let booking">{{ booking.bookingNo }}</td>
+              <td mat-cell *matCellDef="let booking">
+                <a
+                  href="javascript:void(0)"
+                  class="id-link"
+                  (click)="openBookingDetails(booking)"
+                  >{{ booking.bookingNo }}</a
+                >
+              </td>
             </ng-container>
 
             <ng-container matColumnDef="patientName">
               <th mat-header-cell *matHeaderCellDef>Patient Name</th>
               <td mat-cell *matCellDef="let booking">
-                <b>{{ booking.patientName }}</b>
+                <b>{{ booking.patient.name }}</b>
               </td>
             </ng-container>
 
@@ -46,7 +53,7 @@
               <td mat-cell *matCellDef="let booking">
                 <div class="flex-wrap gap-4">
                   @for (test of booking.tests; track test.id) {
-                    <span class="role-badge">{{ test.testName }}</span>
+                    <span class="role-badge" style="margin-right: 3px">{{ test.testName }}</span>
                   }
                 </div>
               </td>
@@ -121,13 +128,13 @@
 
             <ng-container matColumnDef="bookingNo">
               <th mat-header-cell *matHeaderCellDef>Booking No</th>
-              <td mat-cell *matCellDef="let report">{{ report.bookingNo }}</td>
+              <td mat-cell *matCellDef="let report">{{ report.booking.bookingNo }}</td>
             </ng-container>
 
             <ng-container matColumnDef="patientName">
               <th mat-header-cell *matHeaderCellDef>Patient Name</th>
               <td mat-cell *matCellDef="let report">
-                <b>{{ report.patientName }}</b>
+                <b>{{ report.patient.name }}</b>
               </td>
             </ng-container>
 
@@ -135,8 +142,8 @@
               <th mat-header-cell *matHeaderCellDef>Tests</th>
               <td mat-cell *matCellDef="let report">
                 <div class="flex-wrap gap-4">
-                  @for (test of report.tests; track test.id) {
-                    <span class="role-badge">{{ test.testName }}</span>
+                  @for (test of report.testResults; track test.id) {
+                    <span class="role-badge">{{ test.test.testName }}</span>
                   }
                 </div>
               </td>
@@ -145,7 +152,7 @@
             <ng-container matColumnDef="reportedDate">
               <th mat-header-cell *matHeaderCellDef>Reported Date</th>
               <td mat-cell *matCellDef="let report">
-                {{ report.reportedDate | date: 'mediumDate' }}
+                {{ report.createdAt | date: 'mediumDate' }}
               </td>
             </ng-container>
 
@@ -231,7 +238,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (res of reportModel.results; track res.testId) {
+            @for (res of reportModel.testResults; track res.testId) {
               <tr>
                 <td>
                   <b>{{ res.testName }}</b>
@@ -239,7 +246,7 @@
                 <td>
                   <input
                     type="text"
-                    [(ngModel)]="res.value"
+                    [(ngModel)]="res.result"
                     class="form-control mini"
                     placeholder="Enter result"
                   />
@@ -255,20 +262,31 @@
           </tbody>
         </table>
       </div>
-
     </div>
   </div>
 
   <div class="panel-footer flex justify-between align-center">
-    <button class="btn btn-outline-secondary" (click)="previewReport()">
-      <mat-icon>visibility</mat-icon> Preview
+    <button class="btn btn-outline-secondary" (click)="previewReport(reportModel)">
+      @if (isSubmitting1) {
+        <mat-icon class="spinner">autorenew</mat-icon> Processing...
+      } @else {
+        <mat-icon>visibility</mat-icon> Preview
+      }
     </button>
     <div class="flex gap-12">
-      <button class="btn btn-secondary" (click)="saveReport(true)" [disabled]="isSubmitting">
-        Draft
+      <button class="btn btn-secondary" (click)="saveReport(true)" [disabled]="isSubmitting2">
+        @if (isSubmitting2) {
+          <mat-icon class="spinner">autorenew</mat-icon> Processing...
+        } @else {
+          <mat-icon>check_circle</mat-icon> Draft
+        }
       </button>
-      <button class="btn btn-primary" (click)="saveReport(false)" [disabled]="isSubmitting">
-        <mat-icon>check_circle</mat-icon> Save
+      <button class="btn btn-primary" (click)="saveReport(false)" [disabled]="isSubmitting3">
+        @if (isSubmitting3) {
+          <mat-icon class="spinner">autorenew</mat-icon> Processing...
+        } @else {
+          <mat-icon>check_circle</mat-icon> Save
+        }
       </button>
     </div>
   </div>

@@ -13,12 +13,18 @@
   <div class="filters-row">
     <div class="search-box">
       <mat-icon>search</mat-icon>
-      <input type="text" [(ngModel)]="searchQuery" placeholder="Search by name, ID or phone..." />
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="applyFilters(true)"
+        placeholder="Search by name, ID or phone..."
+      />
     </div>
 
     <div class="filter-select">
       <mat-select
         [(ngModel)]="filterPaymentStatus"
+        (ngModelChange)="applyFilters(true)"
         class="modern-select"
         panelClass="custom-select-panel"
       >
@@ -32,6 +38,7 @@
     <div class="filter-select">
       <mat-select
         [(ngModel)]="filterBookingStatus"
+        (ngModelChange)="applyFilters(true)"
         class="modern-select"
         panelClass="custom-select-panel"
       >
@@ -51,13 +58,13 @@
   </div>
 
   <p class="results-count text-muted">
-    Showing {{ getFilteredBookings().length }} of {{ totalFilteredItems }} bookings
+    Showing {{ filteredBookings.length }} of {{ totalFilteredItems }} bookings
   </p>
 
   <!-- Table Section -->
   <div class="table-card mt-24">
     <div class="table-container scrollable-x">
-      <table mat-table [dataSource]="getFilteredBookings()" matSort class="modern-table">
+      <table mat-table [dataSource]="filteredBookings" matSort class="modern-table">
         <!-- Booking No -->
         <ng-container matColumnDef="bookingNo">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Booking No</th>

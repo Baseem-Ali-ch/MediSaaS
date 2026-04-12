@@ -19,4 +19,10 @@ model ActivityLog {
 
   testId Int?
   test   Test? @relation(fields: [testId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  bookingId Int?
+  booking   Booking? @relation(fields: [bookingId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  reportId Int?
+  report   Report? @relation(fields: [reportId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }

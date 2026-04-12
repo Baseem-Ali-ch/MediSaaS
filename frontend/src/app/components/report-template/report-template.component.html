@@ -1,0 +1,255 @@
+<div class="report-document" id="report-document">
+  <!-- [1] LAB / BRANCH HEADER -->
+  <header class="report-header">
+    <div class="lab-info">
+      <h1 class="lab-name">{{ data.lab?.name || 'MediSaaS Diagnostics' }}</h1>
+      <p class="registration">Reg No: {{ data.lab?.registrationNo || 'REG-2024-MS-001' }}</p>
+      <p class="address">
+        {{ data.lab?.address1 }}
+        {{ data.lab?.address2 ? ', ' + data.lab?.address2 : '' }}
+        {{ data.lab?.city ? ', ' + data.lab?.city : '' }}
+        {{ data.lab?.state ? ', ' + data.lab?.state : '' }}
+        {{ data.lab?.country ? ', ' + data.lab?.country : '' }}
+        {{ data.lab?.postalCode ? ' - ' + data.lab?.postalCode : '' }}
+      </p>
+      <p class="contact">
+        <mat-icon>phone</mat-icon> {{ data.lab?.phone || '+91 98765 43210' }} | 
+        <mat-icon>email</mat-icon> {{ data.lab?.email || 'contact@medisaas.com' }}
+      </p>
+    </div>
+    
+    <div class="branch-info" *ngIf="data.branch">
+      <h3 class="branch-name">{{ data.branch.name }}</h3>
+      <p class="branch-address">{{ data.branch.address }}, {{ data.branch.city }}, {{ data.branch.state }}</p>
+      <p class="branch-contact">
+        <mat-icon>phone</mat-icon> {{ data.branch.phone }} | 
+        <mat-icon>email</mat-icon> {{ data.branch.email }}
+      </p>
+    </div>
+  </header>
+
+  <mat-divider></mat-divider>
+
+  <div class="report-body">
+    <!-- [2] REPORT META & [3] PATIENT INFO (Grid layout) -->
+    <div class="info-section">
+      <div class="patient-card">
+        <h4 class="section-title">PATIENT INFORMATION</h4>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Patient ID:</span>
+            <span class="value">{{ data.patient?.refId }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Name:</span>
+            <span class="value bold uppercase">{{ data.patient?.name }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Gender:</span>
+            <span class="value">{{ data.patient?.gender }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Age:</span>
+            <span class="value">{{ data.patient?.age }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Date of Birth:</span>
+            <span class="value">{{ data.patient?.dateOfBirth | date: 'mediumDate' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Blood Group:</span>
+            <span class="value">{{ data.patient?.bloodGroup || '-' }}</span>
+          </div>
+          <div class="info-item full">
+            <span class="label">Phone:</span>
+            <span class="value">{{ data.patient?.phone }}</span>
+          </div>
+          <div class="info-item full">
+            <span class="label">Address:</span>
+            <span class="value">{{ data.patient?.address }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="meta-card">
+        <h4 class="section-title">REPORT DETAILS</h4>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Report ID:</span>
+            <span class="value">{{ data.reportId }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Booking No:</span>
+            <span class="value">{{ data.booking?.bookingNo }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Status:</span>
+            <span class="value">
+              <span class="status-badge" [ngClass]="data.status?.toLowerCase()">{{ data.status }}</span>
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="label">Created:</span>
+            <span class="value">{{ data.createdAt | date: 'medium' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Updated:</span>
+            <span class="value">{{ data.updatedAt | date: 'medium' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- [4] BOOKING / BILLING INFO -->
+    <div class="billing-section mt-16">
+      <h4 class="section-title">BOOKING & BILLING SUMMARY</h4>
+      <div class="billing-row">
+        <div class="billing-item">
+          <span class="label">Booked For:</span>
+          <span class="value">{{ data.booking?.bookedFor | date: 'mediumDate' }}</span>
+        </div>
+        <div class="billing-item">
+          <span class="label">Tests Count:</span>
+          <span class="value">{{ data.booking?.testsCount }}</span>
+        </div>
+        <div class="billing-item">
+          <span class="label">Final Amount:</span>
+          <span class="value currency">₹{{ data.booking?.finalAmount }}</span>
+        </div>
+        <div class="billing-item">
+          <span class="label">Payment:</span>
+          <span class="value">{{ data.booking?.paymentStatus }}</span>
+        </div>
+        <div class="billing-item">
+          <span class="label">Booking Status:</span>
+          <span class="value">{{ data.booking?.bookingStatus }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-header-banner mt-24">
+      TEST RESULTS
+    </div>
+
+    <!-- [5] TEST RESULTS -->
+    <div class="test-results-container">
+      @for (res of data.testResults; track $index) {
+        <div class="test-block p-16">
+          <!-- [5.1] TEST HEADER -->
+          <div class="test-meta-header flex-between mb-8">
+            <div class="test-name-group">
+              <h3 class="test-main-name">{{ res.test.testName }}</h3>
+              <span class="test-code">{{ res.test.testCode }}</span>
+              <span class="test-category">{{ res.test.category }}</span>
+            </div>
+            <div class="test-type-info text-right">
+              <p>Sample: <b>{{ res.test.sampleType }}</b></p>
+              <p>Method: <b>{{ res.test.method }}</b></p>
+            </div>
+          </div>
+
+          <div class="test-extra-details flex gap-24 mb-16 text-muted">
+            <span>Short Name: {{ res.test.shortName }}</span>
+            <span>Turnaround: {{ res.test.turnaroundTime }}</span>
+            <span>Fasting: {{ res.test.fastingRequired ? 'Yes' : 'No' }}</span>
+          </div>
+
+          <!-- [5.2] Numeric / Text Result -->
+          <div class="result-display" *ngIf="res.test.resultType === 'Numeric' || res.test.resultType === 'Text'">
+            <div class="result-row-primary">
+              <div class="result-val-group">
+                <span class="label">RESULT</span>
+                <span class="value-highlight">{{ res.result }}</span>
+              </div>
+              <div class="unit-group">
+                <span class="label">UNIT</span>
+                <span class="value">{{ res.test.unit || '-' }}</span>
+              </div>
+              <div class="range-group">
+                <span class="label">REF. RANGE</span>
+                <span class="value">{{ res.test.referenceRange || '-' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- [5.3] Multi Parameter Result as Table -->
+          <div class="multi-param-container" *ngIf="res.test.resultType === 'Multi Parameter'">
+            <table class="params-table">
+              <thead>
+                <tr>
+                  <th>Parameter Name</th>
+                  <th>Result</th>
+                  <th>Unit</th>
+                  <th>Ref. Range</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (param of res.test.parsedParameters; track $index) {
+                  <tr>
+                    <td>{{ param.name }}</td>
+                    <td class="bold font-600">{{ getParamResult(res, param.name) }}</td>
+                    <td>{{ param.unit || '-' }}</td>
+                    <td>{{ param.referenceRange || '-' }}</td>
+                  </tr>
+                }
+                <!-- Fallback if it's multi-parameter but no parameters defined -->
+                @if (!res.test.parsedParameters || res.test.parsedParameters.length === 0) {
+                  <tr>
+                    <td>{{ res.test.testName }}</td>
+                    <td class="bold font-600">{{ res.result }}</td>
+                    <td>{{ res.test.unit || '-' }}</td>
+                    <td>{{ res.test.referenceRange || '-' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- [5.4] PREPARATION NOTES -->
+          <div class="preparation-notes mt-12" *ngIf="res.test.preparationNotes || res.test.description">
+            <div class="note-item" *ngIf="res.test.preparationNotes">
+              <span class="label">Preparation:</span>
+              <p>{{ res.test.preparationNotes }}</p>
+            </div>
+            <div class="note-item" *ngIf="res.test.description">
+              <span class="label">Description:</span>
+              <p>{{ res.test.description }}</p>
+            </div>
+          </div>
+        </div>
+        <!-- Separator between tests -->
+        <mat-divider *ngIf="!$last"></mat-divider>
+      }
+    </div>
+
+    <!-- [5.5] AI SUGGESTION -->
+    <div class="ai-suggestion-section mt-32 p-20" *ngIf="data.aiSuggestion">
+      <div class="ai-header flex align-center gap-8 mb-12">
+        <mat-icon class="ai-icon">psychology</mat-icon>
+        <h3 class="ai-title">AI Insight & Suggestions</h3>
+      </div>
+      <div class="ai-content p-16">
+        <p class="suggestion-text">{{ data.aiSuggestion }}</p>
+        <div class="ai-disclaimer mt-16 flex align-center gap-8">
+          <mat-icon>info</mat-icon>
+          <span><b>Note:</b> This insight is generated by AI for informational purposes only. It is not a clinical diagnosis. Please consult with your doctor for professional medical advice.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [6] FOOTER / SIGNATURE -->
+  <footer class="report-footer">
+    <div class="signature-section flex-between">
+      <div class="generated-info">
+        <p>Generated at: {{ data.createdAt | date: 'medium' }}</p>
+        <p class="disclaimer">This is a computer-generated report and does not require a physical signature.</p>
+      </div>
+      <div class="signatory">
+        <div class="sig-line"></div>
+        <p class="name"><b>{{ data.verifiedBy || '[Authorised signatory name]' }}</b></p>
+        <p class="role">{{ data.designation || '[Role]' }}</p>
+      </div>
+    </div>
+  </footer>
+</div>
